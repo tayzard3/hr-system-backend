@@ -1,0 +1,14 @@
+{
+	"compilerOptions": {
+		"module": "CommonJS",
+		"moduleResolution": "Node",
+		"target": "ESNext",
+		"sourceMap": true,
+		"outDir": "./database/constants",
+		"esModuleInterop": true,
+		"strict": true,
+		"typeRoots": []
+	},
+	"include": ["./src/constants/**/*.ts"],
+	"exclude": ["node_modules"]
+}

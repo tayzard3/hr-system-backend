@@ -1,0 +1,21 @@
+{
+	"compilerOptions": {
+		"module": "Node16",
+		"moduleResolution": "Node16",
+		"target": "ES2020", // For compatibility, or ESNext if needed
+		"sourceMap": true,
+		"outDir": "dist",
+		"esModuleInterop": true,
+		"strict": true, // This can help with type checking
+		"typeRoots": ["./src/types", "./node_modules/@types"],
+		"experimentalDecorators": true, //For Inversify
+		"emitDecoratorMetadata": true, //For Inversify
+		"lib": ["ES2020"] //For Inversify
+	},
+	"ts-node": {
+		"experimentalSpecifierResolution": "node"
+	},
+	"include": ["./**/*.ts"],
+	"exclude": ["node_modules"],
+	"files": ["./src/types/express.d.ts"]
+}

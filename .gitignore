@@ -1,0 +1,19 @@
+# Dependencies
+node_modules/
+
+# Build output (tsconfig.json outDir)
+dist/
+
+# Environment
+.env
+.env.*.local
+
+# App logs (winston-daily-rotate-file, src/utils/Log.ts)
+logs/
+
+# OS
+.DS_Store
+
+# Editor
+.vscode/
+.idea/

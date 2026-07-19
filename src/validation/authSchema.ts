@@ -1,16 +1,20 @@
 import z from 'zod'
 
+// Shared password strength rule (min/max length + letter + number) — reused
+// wherever a new plaintext password is accepted (sign-up, change-password).
+const passwordSchema = z
+	.string()
+	.min(9, { message: 'Password must be at least 9 characters long' })
+	.max(14, { message: 'Password cannot exceed 14 characters' })
+	.regex(/[a-zA-Z]/, {
+		message: 'Password must include at least one letter',
+	})
+	.regex(/\d/, { message: 'Password must include at least one number' })
+
 const signUpSchema = z.object({
 	name: z.string(),
 	email: z.string().email({ message: 'Invalid email format' }),
-	password: z
-		.string()
-		.min(9, { message: 'Password must be at least 9 characters long' })
-		.max(14, { message: 'Password cannot exceed 14 characters' })
-		.regex(/[a-zA-Z]/, {
-			message: 'Password must include at least one letter',
-		})
-		.regex(/\d/, { message: 'Password must include at least one number' }),
+	password: passwordSchema,
 })
 
 const signInSchema = z.object({
@@ -25,6 +29,21 @@ const forgetPasswordSchema = z.object({
 
 const resetPasswordSchema = z.object({
 	password: z.string(),
+})
+
+// Cross-field match between `newPassword`/`confirmNewPassword` is intentionally
+// NOT enforced here: the API spec calls for a `400` on mismatch, but
+// `zodSchemaValidator` always responds `422` for schema failures, so that check
+// is done in `AuthService.changePassword` instead where it can throw the
+// `400 AppException` the spec requires. This schema only validates shape/strength.
+const changePasswordSchema = z.object({
+	currentPassword: z
+		.string()
+		.min(1, { message: 'currentPassword is required' }),
+	newPassword: passwordSchema,
+	confirmNewPassword: z
+		.string()
+		.min(1, { message: 'confirmNewPassword is required' }),
 })
 
 const refreshTokenSchema = z.object({
@@ -64,4 +83,5 @@ export {
 	updateUserRoleSchema,
 	updateUserSchema,
 	updateProfileSchema,
+	changePasswordSchema,
 }

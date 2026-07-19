@@ -18,6 +18,7 @@ import { IEmailService } from '../interfaces/service/IEmailService'
 import { SendGridEmailOptions } from '../utils/Email'
 import { UserWithRelations } from '../types/userTypes'
 import {
+	ChangePasswordDTO,
 	refreshTokenResponseType,
 	UpdateProfileDTO,
 	UpdateProfileResponseType,
@@ -433,6 +434,47 @@ class AuthService implements IAuthService {
 				? { id: country.id, code: country.code, name: country.name }
 				: null,
 		}
+	}
+
+	/**
+	 * Changes the authenticated user's own password. `newPassword`/
+	 * `confirmNewPassword` equality is enforced here (rather than in the zod
+	 * schema) so a mismatch can surface as the `400` the API spec calls for —
+	 * `zodSchemaValidator` always responds `422` for schema-level failures.
+	 */
+	public async changePassword(
+		userId: number,
+		data: ChangePasswordDTO
+	): Promise<void> {
+		const { currentPassword, newPassword, confirmNewPassword } = data
+
+		if (newPassword !== confirmNewPassword) {
+			throw new AppException(
+				'New password and confirm password do not match!',
+				400
+			)
+		}
+
+		const user = await this.userRepository.findByPk(userId)
+
+		if (!user) {
+			throw new AppException('User not found!', 404)
+		}
+
+		const isCurrentPasswordValid = await this.passwordService.verifyPassword(
+			currentPassword,
+			user.password || ''
+		)
+
+		if (!isCurrentPasswordValid) {
+			throw new AppException('Current password is incorrect!', 401)
+		}
+
+		const hashedPassword = await this.passwordService.hashPassword(
+			newPassword
+		)
+
+		await user.update({ password: hashedPassword })
 	}
 }
 

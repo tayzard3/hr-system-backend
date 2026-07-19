@@ -70,4 +70,14 @@ export default class AuthController {
 			message: 'Logged out successfully.',
 		})
 	})
+
+	public updateProfile = asyncHandler(async (req: Request, res: Response) => {
+		const { id } = req.user
+		const data = await this.authService.updateProfile(id, req.body)
+
+		responseHandler(res, 200, {
+			message: 'Success',
+			data,
+		})
+	})
 }

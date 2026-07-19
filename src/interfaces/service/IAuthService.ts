@@ -5,6 +5,8 @@ import {
 	refreshTokenResponseType,
 	signInResponseType,
 	signUpResponseType,
+	UpdateProfileDTO,
+	UpdateProfileResponseType,
 } from '../../types/authServiceTypes'
 import { InferAttributes } from 'sequelize'
 import { UserWithRelations } from '../../types/userTypes'
@@ -24,4 +26,8 @@ export interface IAuthService {
 	signUp(userData: InferAttributes<User>): Promise<signUpResponseType | null>
 	findUserById(userId: number): Promise<User | null>
 	findUserWithRelations(userId: number): Promise<UserWithRelations | null>
+	updateProfile(
+		userId: number,
+		data: UpdateProfileDTO
+	): Promise<UpdateProfileResponseType>
 }

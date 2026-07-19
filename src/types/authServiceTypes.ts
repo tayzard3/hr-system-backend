@@ -21,3 +21,26 @@ export interface refreshTokenResponseType {
 	accessTokenExpiresAt: Date
 	refreshTokenExpiresAt: Date
 }
+
+export interface UpdateProfileDTO {
+	firstName: string
+	lastName: string
+	email: string
+	username: string
+	/** Integer FK to `countries.id` (see User model) — nullable, matches column. */
+	countryId?: number | null
+}
+
+export interface UpdateProfileCountry {
+	id: number
+	code: string
+	name: string
+}
+
+export interface UpdateProfileResponseType {
+	id: number
+	fullName: string
+	email: string
+	username: string | null
+	country: UpdateProfileCountry | null
+}

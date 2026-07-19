@@ -5,6 +5,7 @@ import {
 	refreshTokenSchema,
 	resetPasswordSchema,
 	signInSchema,
+	updateProfileSchema,
 } from '../../validation/authSchema'
 import AuthController from '../../controllers/AuthController'
 import { TYPES } from '../../containers/inversifyTypes'
@@ -34,6 +35,13 @@ router
 		authController.resetPassword
 	)
 router.route('/me').get(protect, authController.getMe)
+router
+	.route('/update-profile')
+	.put(
+		protect,
+		zodSchemaValidator(updateProfileSchema),
+		authController.updateProfile
+	)
 router
 	.route('/logout')
 	.post(zodSchemaValidator(refreshTokenSchema), authController.logOut)

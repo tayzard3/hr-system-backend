@@ -2,6 +2,7 @@ import { NextFunction } from 'express'
 import jwt from 'jsonwebtoken'
 import { User } from '../../models/User'
 import {
+	ChangePasswordDTO,
 	refreshTokenResponseType,
 	signInResponseType,
 	signUpResponseType,
@@ -30,4 +31,5 @@ export interface IAuthService {
 		userId: number,
 		data: UpdateProfileDTO
 	): Promise<UpdateProfileResponseType>
+	changePassword(userId: number, data: ChangePasswordDTO): Promise<void>
 }

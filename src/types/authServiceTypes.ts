@@ -44,3 +44,9 @@ export interface UpdateProfileResponseType {
 	username: string | null
 	country: UpdateProfileCountry | null
 }
+
+export interface ChangePasswordDTO {
+	currentPassword: string
+	newPassword: string
+	confirmNewPassword: string
+}

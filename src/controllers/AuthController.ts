@@ -80,4 +80,21 @@ export default class AuthController {
 			data,
 		})
 	})
+
+	public changePassword = asyncHandler(
+		async (req: Request, res: Response) => {
+			const { id } = req.user
+			const { currentPassword, newPassword, confirmNewPassword } = req.body
+
+			await this.authService.changePassword(id, {
+				currentPassword,
+				newPassword,
+				confirmNewPassword,
+			})
+
+			responseHandler(res, 200, {
+				message: 'Password changed successfully.',
+			})
+		}
+	)
 }

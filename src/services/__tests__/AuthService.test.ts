@@ -493,4 +493,82 @@ describe('AuthService', () => {
 			expect(result.country).toBeNull()
 		})
 	})
+
+	describe('changePassword', () => {
+		const changePasswordPayload = {
+			currentPassword: 'OldPass1!',
+			newPassword: 'NewPass2!',
+			confirmNewPassword: 'NewPass2!',
+		}
+
+		const buildUserInstance = (overrides: Record<string, unknown> = {}) => {
+			const instance = {
+				id: 1,
+				password: 'hashed-old-password',
+				...overrides,
+			}
+			return {
+				...instance,
+				update: jest.fn(async (data: Record<string, unknown>) => {
+					Object.assign(instance, data)
+					return instance
+				}),
+			}
+		}
+
+		it('throws 400 when newPassword and confirmNewPassword do not match', async () => {
+			await expect(
+				authService.changePassword(1, {
+					...changePasswordPayload,
+					confirmNewPassword: 'Different1!',
+				})
+			).rejects.toMatchObject({
+				message: 'New password and confirm password do not match!',
+				statusCode: 400,
+			})
+
+			expect(userRepository.findByPk).not.toHaveBeenCalled()
+		})
+
+		it('throws 404 when the user does not exist', async () => {
+			userRepository.findByPk.mockResolvedValue(null)
+
+			await expect(
+				authService.changePassword(999, changePasswordPayload)
+			).rejects.toMatchObject({ message: 'User not found!', statusCode: 404 })
+		})
+
+		it('throws 401 when the current password is incorrect', async () => {
+			userRepository.findByPk.mockResolvedValue(buildUserInstance() as never)
+			passwordService.verifyPassword.mockResolvedValue(false)
+
+			await expect(
+				authService.changePassword(1, changePasswordPayload)
+			).rejects.toMatchObject({
+				message: 'Current password is incorrect!',
+				statusCode: 401,
+			})
+
+			expect(passwordService.verifyPassword).toHaveBeenCalledWith(
+				changePasswordPayload.currentPassword,
+				'hashed-old-password'
+			)
+		})
+
+		it('hashes and persists the new password on success', async () => {
+			const userInstance = buildUserInstance()
+			userRepository.findByPk.mockResolvedValue(userInstance as never)
+			passwordService.verifyPassword.mockResolvedValue(true)
+			passwordService.hashPassword.mockResolvedValue('hashed-new-password')
+
+			await authService.changePassword(1, changePasswordPayload)
+
+			expect(passwordService.hashPassword).toHaveBeenCalledWith(
+				changePasswordPayload.newPassword
+			)
+			expect(userInstance.update).toHaveBeenCalledWith({
+				password: 'hashed-new-password',
+			})
+		})
+	})
 })

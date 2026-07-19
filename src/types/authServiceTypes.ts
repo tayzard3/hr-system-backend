@@ -10,4 +10,14 @@ export interface signUpResponseType {
 export interface signInResponseType {
 	user: { name: string; email: string }
 	accessToken: string
+	refreshToken: string
+	accessTokenExpiresAt: Date
+	refreshTokenExpiresAt: Date
+}
+
+export interface refreshTokenResponseType {
+	accessToken: string
+	refreshToken: string
+	accessTokenExpiresAt: Date
+	refreshTokenExpiresAt: Date
 }

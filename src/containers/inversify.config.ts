@@ -23,6 +23,8 @@ import { PermissionService } from '../services/PermissionService'
 import { PermissionController } from '../controllers/PermissionController'
 import { IEmailService } from '../interfaces/service/IEmailService'
 import { SendGridEmailService } from '../services/EmailService'
+import { IRefreshTokenRepository } from '../interfaces/repository/IRefreshTokenRepository'
+import { RefreshTokenRepository } from '../repositories/RefreshTokenRepository'
 
 const container = new Container()
 
@@ -34,6 +36,9 @@ container.bind<IRoleRepository>(TYPES.IRoleRepository).to(RoleRepository)
 container
 	.bind<IPermissionRepository>(TYPES.IPermissionRepository)
 	.to(PermissionRepository)
+container
+	.bind<IRefreshTokenRepository>(TYPES.IRefreshTokenRepository)
+	.to(RefreshTokenRepository)
 
 /** Service */
 container.bind<IUserService>(TYPES.IUserService).to(UserService)

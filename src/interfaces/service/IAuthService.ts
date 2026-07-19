@@ -2,6 +2,7 @@ import { NextFunction } from 'express'
 import jwt from 'jsonwebtoken'
 import { User } from '../../models/User'
 import {
+	refreshTokenResponseType,
 	signInResponseType,
 	signUpResponseType,
 } from '../../types/authServiceTypes'
@@ -16,6 +17,8 @@ export interface IAuthService {
 	signIn(
 		userData: InferAttributes<User>
 	): Promise<signInResponseType | undefined>
+	refreshToken(rawRefreshToken: string): Promise<refreshTokenResponseType>
+	logout(rawRefreshToken: string): Promise<void>
 	forgotPassword(email: string, redirectTo: string): Promise<void>
 	resetPassword(userId: number, password: string): Promise<void>
 	signUp(userData: InferAttributes<User>): Promise<signUpResponseType | null>

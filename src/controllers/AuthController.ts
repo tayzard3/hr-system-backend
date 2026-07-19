@@ -17,6 +17,16 @@ export default class AuthController {
 		})
 	})
 
+	public refreshToken = asyncHandler(async (req: Request, res: Response) => {
+		const { refreshToken } = req.body
+		const data = await this.authService.refreshToken(refreshToken)
+
+		responseHandler(res, 200, {
+			message: 'Success',
+			data,
+		})
+	})
+
 	public forgotPassword = asyncHandler(async (req: Request, res: Response) => {
 		const { email, redirectTo } = req.body
 		const data = await this.authService.forgotPassword(email, redirectTo)
@@ -45,10 +55,12 @@ export default class AuthController {
 		})
 	})
 
-	public logOut = asyncHandler(async (_req: Request, res: Response) => {
-		// No need to revoke, we'll just return nothing to trigger a 204 response.
+	public logOut = asyncHandler(async (req: Request, res: Response) => {
+		const { refreshToken } = req.body
+		await this.authService.logout(refreshToken)
+
 		responseHandler(res, 200, {
-			message: 'Success',
+			message: 'Logged out successfully.',
 		})
 	})
 }

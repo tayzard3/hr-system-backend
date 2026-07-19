@@ -27,6 +27,10 @@ const resetPasswordSchema = z.object({
 	password: z.string(),
 })
 
+const refreshTokenSchema = z.object({
+	refreshToken: z.string().min(1, { message: 'refreshToken is required' }),
+})
+
 const updateUserRoleSchema = z.object({
 	roles: z.array(z.number()),
 })
@@ -42,6 +46,7 @@ export {
 	signInSchema,
 	forgetPasswordSchema,
 	resetPasswordSchema,
+	refreshTokenSchema,
 	updateUserRoleSchema,
 	updateUserSchema,
 }

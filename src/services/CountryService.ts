@@ -3,6 +3,7 @@ import { FindAndCountOptions, FindOptions, Op, WhereOptions } from 'sequelize'
 import { ICountryService } from '../interfaces/service/ICountryService'
 import { ICountryRepository } from '../interfaces/repository/ICountryRepository'
 import { Country } from '../models/Country'
+import { sequelize } from '../models'
 import { TYPES } from '../containers/inversifyTypes'
 import AppException from '../exceptions/AppException'
 import {
@@ -98,15 +99,18 @@ export class CountryService implements ICountryService {
 			updateData.code = code
 		}
 
-		const [, updatedCountries] = await this.countryRepository.update(
-			updateData,
-			{
-				where: { id },
-				returning: true,
-			}
-		)
-
-		return updatedCountries[0] || null
+		// Note: this project's DB dialect is MySQL, which does not support
+		// `RETURNING`. `BaseRepository.update()` with `returning: true`
+		// therefore resolves as `[affectedCount]` (a bare number, not
+		// `[affectedCount, affectedRows]`), so destructuring the second
+		// element previously produced `1` instead of the updated row -
+		// causing `updatedCountries[0]` to be `undefined` and the API to
+		// always respond 404. Updating the already-fetched instance
+		// directly avoids relying on `RETURNING` and works consistently
+		// across dialects.
+		return await sequelize.transaction(async (transaction) => {
+			return country.update(updateData, { transaction })
+		})
 	}
 
 	public async deleteCountry(id: number): Promise<boolean> {

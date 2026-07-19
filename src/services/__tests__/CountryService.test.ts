@@ -1,4 +1,22 @@
+import { Transaction } from 'sequelize'
 import { ICountryRepository } from '../../interfaces/repository/ICountryRepository'
+
+// CountryService pulls `sequelize` in from '../models' purely to call
+// `.transaction(...)` for updateCountry. Mock the whole models module so
+// unit tests never touch a real DB connection.
+const transactionMock = jest.fn(
+	async (cb: (t: Transaction) => Promise<unknown>) =>
+		cb({} as unknown as Transaction)
+)
+
+jest.mock('../../models', () => ({
+	sequelize: {
+		transaction: (cb: (t: Transaction) => Promise<unknown>) =>
+			transactionMock(cb),
+	},
+}))
+
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 import { CountryService } from '../CountryService'
 
 describe('CountryService', () => {
@@ -98,11 +116,12 @@ describe('CountryService', () => {
 			})
 
 			expect(result).toBeNull()
-			expect(countryRepository.update).not.toHaveBeenCalled()
+			expect(transactionMock).not.toHaveBeenCalled()
 		})
 
 		it('throws 409 when renaming to a code already used by another country', async () => {
-			countryRepository.findByPk.mockResolvedValue(singapore as never)
+			const countryInstance = { ...singapore, update: jest.fn() }
+			countryRepository.findByPk.mockResolvedValue(countryInstance as never)
 			countryRepository.findByCode.mockResolvedValue({
 				id: 2,
 				code: 'MY',
@@ -115,26 +134,29 @@ describe('CountryService', () => {
 				message: 'Country with this code already exists',
 				statusCode: 409,
 			})
+			expect(countryInstance.update).not.toHaveBeenCalled()
 		})
 
-		it('allows re-saving the same country with its own existing code', async () => {
-			countryRepository.findByPk.mockResolvedValue(singapore as never)
-			countryRepository.findByCode.mockResolvedValue(singapore as never)
-			countryRepository.update.mockResolvedValue([
-				1,
-				[{ ...singapore, name: 'Singapore Republic' } as never],
-			])
+		it('allows re-saving the same country with its own existing code, returning the updated instance', async () => {
+			const updated = { ...singapore, name: 'Singapore Republic' }
+			const countryInstance = {
+				...singapore,
+				update: jest.fn().mockResolvedValue(updated),
+			}
+			countryRepository.findByPk.mockResolvedValue(countryInstance as never)
+			countryRepository.findByCode.mockResolvedValue(countryInstance as never)
 
 			const result = await countryService.updateCountry(1, {
 				code: 'sg',
 				name: 'Singapore Republic',
 			})
 
-			expect(countryRepository.update).toHaveBeenCalledWith(
+			expect(countryInstance.update).toHaveBeenCalledWith(
 				{ code: 'SG', name: 'Singapore Republic' },
-				expect.objectContaining({ where: { id: 1 }, returning: true })
+				expect.objectContaining({ transaction: expect.anything() })
 			)
-			expect(result).toEqual({ ...singapore, name: 'Singapore Republic' })
+			expect(countryRepository.update).not.toHaveBeenCalled()
+			expect(result).toEqual(updated)
 		})
 	})
 

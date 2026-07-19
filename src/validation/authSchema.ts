@@ -31,6 +31,20 @@ const refreshTokenSchema = z.object({
 	refreshToken: z.string().min(1, { message: 'refreshToken is required' }),
 })
 
+const updateProfileSchema = z.object({
+	firstName: z.string().min(1, { message: 'firstName is required' }),
+	lastName: z.string().min(1, { message: 'lastName is required' }),
+	email: z.string().email({ message: 'Invalid email format' }),
+	username: z
+		.string()
+		.min(1, { message: 'username is required' })
+		.max(50, { message: 'username cannot exceed 50 characters' }),
+	// Integer FK to `countries.id` (see User model) — not a real UUID despite
+	// the API spec sample showing "uuid"; nullable so a profile can clear its
+	// country by sending `null`, optional so it can be omitted entirely.
+	countryId: z.number().int().positive().nullable().optional(),
+})
+
 const updateUserRoleSchema = z.object({
 	roles: z.array(z.number()),
 })
@@ -49,4 +63,5 @@ export {
 	refreshTokenSchema,
 	updateUserRoleSchema,
 	updateUserSchema,
+	updateProfileSchema,
 }

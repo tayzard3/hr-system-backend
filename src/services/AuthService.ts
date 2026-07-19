@@ -1,5 +1,5 @@
 import { injectable, inject } from 'inversify'
-import { InferAttributes, QueryTypes, Transaction } from 'sequelize'
+import { InferAttributes, Op, QueryTypes, Transaction } from 'sequelize'
 import crypto from 'crypto'
 import AppException from '../exceptions/AppException'
 import { sequelize } from '../models'
@@ -9,6 +9,7 @@ import appConfig from '../utils/config'
 import jwt from 'jsonwebtoken'
 import { IUserRepository } from '../interfaces/repository/IUserRepository'
 import { IRefreshTokenRepository } from '../interfaces/repository/IRefreshTokenRepository'
+import { ICountryRepository } from '../interfaces/repository/ICountryRepository'
 import { TYPES } from '../containers/inversifyTypes'
 import { IPasswordService } from '../interfaces/repository/IPasswordService'
 import { IAuthService } from '../interfaces/service/IAuthService'
@@ -16,7 +17,11 @@ import { USER_STATUS } from '../constants'
 import { IEmailService } from '../interfaces/service/IEmailService'
 import { SendGridEmailOptions } from '../utils/Email'
 import { UserWithRelations } from '../types/userTypes'
-import { refreshTokenResponseType } from '../types/authServiceTypes'
+import {
+	refreshTokenResponseType,
+	UpdateProfileDTO,
+	UpdateProfileResponseType,
+} from '../types/authServiceTypes'
 
 interface IssuedTokenPair {
 	accessToken: string
@@ -33,6 +38,8 @@ class AuthService implements IAuthService {
 		private userRepository: IUserRepository,
 		@inject(TYPES.IRefreshTokenRepository)
 		private refreshTokenRepository: IRefreshTokenRepository,
+		@inject(TYPES.ICountryRepository)
+		private countryRepository: ICountryRepository,
 		@inject(TYPES.IPasswordService)
 		private passwordService: IPasswordService,
 		@inject(TYPES.IEmailService) private emailService: IEmailService
@@ -340,6 +347,88 @@ class AuthService implements IAuthService {
 		)
 
 		return user
+	}
+
+	/**
+	 * Updates the authenticated user's own profile (first/last name, email,
+	 * username, country). Full-replace semantics (PUT): `countryId` omitted or
+	 * `null` clears the user's country, matching `UpdateProfileDTO`.
+	 *
+	 * Note: `name` (legacy single-field display name, still read by
+	 * `signIn`/`forgotPassword`/`findUserWithRelations`) is kept in sync from
+	 * `firstName`/`lastName` here so those existing call sites don't go stale.
+	 */
+	public async updateProfile(
+		userId: number,
+		data: UpdateProfileDTO
+	): Promise<UpdateProfileResponseType> {
+		const { firstName, lastName, email, username, countryId } = data
+
+		const user = await this.userRepository.findByPk(userId)
+
+		if (!user) {
+			throw new AppException('User not found!', 404)
+		}
+
+		const duplicateUser = await this.userRepository.findOne({
+			where: {
+				id: { [Op.ne]: userId },
+				[Op.or]: [{ email }, { username }],
+			},
+		})
+
+		if (duplicateUser) {
+			if (duplicateUser.email === email) {
+				throw new AppException('Email already in use!', 409)
+			}
+			throw new AppException('Username already in use!', 409)
+		}
+
+		const normalizedCountryId = countryId ?? null
+		let country = null
+
+		if (normalizedCountryId !== null) {
+			country = await this.countryRepository.findByPk(normalizedCountryId, {
+				attributes: ['id', 'code', 'name'],
+			})
+
+			if (!country) {
+				throw new AppException('Country not found!', 400)
+			}
+		}
+
+		const fullName = `${firstName} ${lastName}`.trim()
+
+		const updatedUser = await sequelize.transaction(
+			async (transaction: Transaction) => {
+				// Update the already-fetched instance directly rather than
+				// `repository.update(..., { returning: true })`: this project's
+				// DB dialect is MySQL, which doesn't support `RETURNING`, so
+				// `returning: true` resolves as a bare affected count, not the
+				// updated row (see CountryService.updateCountry for the same fix).
+				return user.update(
+					{
+						firstName,
+						lastName,
+						email,
+						username,
+						countryId: normalizedCountryId,
+						name: fullName,
+					},
+					{ transaction }
+				)
+			}
+		)
+
+		return {
+			id: updatedUser.id,
+			fullName,
+			email: updatedUser.email,
+			username: updatedUser.username,
+			country: country
+				? { id: country.id, code: country.code, name: country.name }
+				: null,
+		}
 	}
 }
 

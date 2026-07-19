@@ -3,6 +3,7 @@ import AppException from '../../exceptions/AppException'
 import { USER_STATUS } from '../../constants'
 import { IUserRepository } from '../../interfaces/repository/IUserRepository'
 import { IRefreshTokenRepository } from '../../interfaces/repository/IRefreshTokenRepository'
+import { ICountryRepository } from '../../interfaces/repository/ICountryRepository'
 import { IPasswordService } from '../../interfaces/repository/IPasswordService'
 import { IEmailService } from '../../interfaces/service/IEmailService'
 
@@ -26,6 +27,7 @@ import AuthService from '../AuthService'
 describe('AuthService', () => {
 	let userRepository: jest.Mocked<IUserRepository>
 	let refreshTokenRepository: jest.Mocked<IRefreshTokenRepository>
+	let countryRepository: jest.Mocked<ICountryRepository>
 	let passwordService: jest.Mocked<IPasswordService>
 	let emailService: jest.Mocked<IEmailService>
 	let authService: AuthService
@@ -77,6 +79,24 @@ describe('AuthService', () => {
 			query: jest.fn(),
 		} as unknown as jest.Mocked<IRefreshTokenRepository>
 
+		countryRepository = {
+			findByCode: jest.fn(),
+			findByPk: jest.fn(),
+			find: jest.fn(),
+			findAndPaginate: jest.fn(),
+			findOne: jest.fn(),
+			findOrCreate: jest.fn(),
+			delete: jest.fn(),
+			update: jest.fn(),
+			create: jest.fn(),
+			bulkCreate: jest.fn(),
+			count: jest.fn(),
+			upsert: jest.fn(),
+			increasement: jest.fn(),
+			decreasement: jest.fn(),
+			query: jest.fn(),
+		} as unknown as jest.Mocked<ICountryRepository>
+
 		passwordService = {
 			hashPassword: jest.fn(),
 			verifyPassword: jest.fn(),
@@ -89,6 +109,7 @@ describe('AuthService', () => {
 		authService = new AuthService(
 			userRepository,
 			refreshTokenRepository,
+			countryRepository,
 			passwordService,
 			emailService
 		)
@@ -314,6 +335,130 @@ describe('AuthService', () => {
 			await expect(authService.logout('already-used-token')).resolves.toBeUndefined()
 
 			expect(refreshTokenRepository.revoke).not.toHaveBeenCalled()
+		})
+	})
+
+	describe('updateProfile', () => {
+		const profileUpdate = {
+			firstName: 'Jane',
+			lastName: 'Smith',
+			email: 'jane.smith@example.com',
+			username: 'janesmith',
+			countryId: 7,
+		}
+
+		const buildUserInstance = (overrides: Record<string, unknown> = {}) => {
+			const instance = {
+				id: 1,
+				email: activeUser.email,
+				username: 'oldusername',
+				...overrides,
+			}
+			return {
+				...instance,
+				update: jest.fn(async (data: Record<string, unknown>) => {
+					Object.assign(instance, data)
+					return instance
+				}),
+			}
+		}
+
+		it('throws 404 when the user does not exist', async () => {
+			userRepository.findByPk.mockResolvedValue(null)
+
+			await expect(
+				authService.updateProfile(999, profileUpdate)
+			).rejects.toMatchObject({ message: 'User not found!', statusCode: 404 })
+		})
+
+		it('throws 409 when the email is already used by another user', async () => {
+			userRepository.findByPk.mockResolvedValue(buildUserInstance() as never)
+			userRepository.findOne.mockResolvedValue({
+				id: 2,
+				email: profileUpdate.email,
+				username: 'someoneelse',
+			} as never)
+
+			await expect(
+				authService.updateProfile(1, profileUpdate)
+			).rejects.toMatchObject({
+				message: 'Email already in use!',
+				statusCode: 409,
+			})
+		})
+
+		it('throws 409 when the username is already used by another user', async () => {
+			userRepository.findByPk.mockResolvedValue(buildUserInstance() as never)
+			userRepository.findOne.mockResolvedValue({
+				id: 2,
+				email: 'someoneelse@example.com',
+				username: profileUpdate.username,
+			} as never)
+
+			await expect(
+				authService.updateProfile(1, profileUpdate)
+			).rejects.toMatchObject({
+				message: 'Username already in use!',
+				statusCode: 409,
+			})
+		})
+
+		it('throws 400 when countryId does not reference an existing country', async () => {
+			userRepository.findByPk.mockResolvedValue(buildUserInstance() as never)
+			userRepository.findOne.mockResolvedValue(null)
+			countryRepository.findByPk.mockResolvedValue(null)
+
+			await expect(
+				authService.updateProfile(1, profileUpdate)
+			).rejects.toMatchObject({ message: 'Country not found!', statusCode: 400 })
+		})
+
+		it('updates the profile, derives fullName, and returns the nested country', async () => {
+			const userInstance = buildUserInstance()
+			userRepository.findByPk.mockResolvedValue(userInstance as never)
+			userRepository.findOne.mockResolvedValue(null)
+			countryRepository.findByPk.mockResolvedValue({
+				id: 7,
+				code: 'SG',
+				name: 'Singapore',
+			} as never)
+
+			const result = await authService.updateProfile(1, profileUpdate)
+
+			expect(userInstance.update).toHaveBeenCalledWith(
+				expect.objectContaining({
+					firstName: 'Jane',
+					lastName: 'Smith',
+					email: profileUpdate.email,
+					username: profileUpdate.username,
+					countryId: 7,
+					name: 'Jane Smith',
+				}),
+				expect.objectContaining({ transaction: {} })
+			)
+			expect(result).toEqual({
+				id: 1,
+				fullName: 'Jane Smith',
+				email: profileUpdate.email,
+				username: profileUpdate.username,
+				country: { id: 7, code: 'SG', name: 'Singapore' },
+			})
+		})
+
+		it('clears the country when countryId is omitted', async () => {
+			const userInstance = buildUserInstance()
+			userRepository.findByPk.mockResolvedValue(userInstance as never)
+			userRepository.findOne.mockResolvedValue(null)
+
+			const { countryId: _countryId, ...withoutCountry } = profileUpdate
+			const result = await authService.updateProfile(1, withoutCountry)
+
+			expect(countryRepository.findByPk).not.toHaveBeenCalled()
+			expect(userInstance.update).toHaveBeenCalledWith(
+				expect.objectContaining({ countryId: null }),
+				expect.objectContaining({ transaction: {} })
+			)
+			expect(result.country).toBeNull()
 		})
 	})
 })

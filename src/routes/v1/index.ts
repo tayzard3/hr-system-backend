@@ -4,6 +4,7 @@ import userRoutes from './userRoutes'
 import roleRoutes from './roleRoutes'
 import permissionRoutes from './permissionRoutes'
 import countryRoutes from './countryRoutes'
+import projectRoutes from './projectRoutes'
 import { protect } from '../../middlewares/authMiddleware'
 
 const router = Router()
@@ -13,5 +14,6 @@ router.use('/users', protect, userRoutes)
 router.use('/roles', protect, roleRoutes)
 router.use('/permissions', protect, permissionRoutes)
 router.use('/countries', protect, countryRoutes)
+router.use('/projects', protect, projectRoutes)
 
 export default router

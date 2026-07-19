@@ -1,6 +1,7 @@
 'use strict'
 Object.defineProperty(exports, '__esModule', { value: true })
-exports.COUNTRY_PERMISSION =
+exports.PROJECT_PERMISSION =
+	exports.COUNTRY_PERMISSION =
 	exports.PERMISSION_PERMISSION =
 	exports.ROLE_PERMISSION =
 	exports.USER_PERMISSION =
@@ -36,5 +37,11 @@ exports.COUNTRY_PERMISSION = Object.freeze({
 	CREATE: 'Country_Create',
 	UPDATE: 'Country_Update',
 	DELETE: 'Country_Delete',
+})
+exports.PROJECT_PERMISSION = Object.freeze({
+	LIST: 'Project_List',
+	CREATE: 'Project_Create',
+	UPDATE: 'Project_Update',
+	DELETE: 'Project_Delete',
 })
 //# sourceMappingURL=permission.js.map

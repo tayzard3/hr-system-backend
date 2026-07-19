@@ -30,6 +30,11 @@ import { CountryRepository } from '../repositories/CountryRepository'
 import { ICountryService } from '../interfaces/service/ICountryService'
 import { CountryService } from '../services/CountryService'
 import { CountryController } from '../controllers/CountryController'
+import { IProjectRepository } from '../interfaces/repository/IProjectRepository'
+import { ProjectRepository } from '../repositories/ProjectRepository'
+import { IProjectService } from '../interfaces/service/IProjectService'
+import { ProjectService } from '../services/ProjectService'
+import { ProjectController } from '../controllers/ProjectController'
 
 const container = new Container()
 
@@ -47,6 +52,9 @@ container
 container
 	.bind<ICountryRepository>(TYPES.ICountryRepository)
 	.to(CountryRepository)
+container
+	.bind<IProjectRepository>(TYPES.IProjectRepository)
+	.to(ProjectRepository)
 
 /** Service */
 container.bind<IUserService>(TYPES.IUserService).to(UserService)
@@ -56,6 +64,7 @@ container
 	.bind<IPermissionService>(TYPES.IPermissionService)
 	.to(PermissionService)
 container.bind<ICountryService>(TYPES.ICountryService).to(CountryService)
+container.bind<IProjectService>(TYPES.IProjectService).to(ProjectService)
 
 // Bind SendGridEmailService or SMTPEmailService to email service
 container.bind<IEmailService>(TYPES.IEmailService).to(SendGridEmailService)
@@ -69,6 +78,7 @@ container
 	.bind<PermissionController>(TYPES.PermissionController)
 	.to(PermissionController)
 container.bind<CountryController>(TYPES.CountryController).to(CountryController)
+container.bind<ProjectController>(TYPES.ProjectController).to(ProjectController)
 
 // container.bind<boolean>('DEBUG').toConstantValue(true)
 

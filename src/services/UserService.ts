@@ -113,7 +113,8 @@ class UserService implements IUserService {
 			let hashedPassword
 
 			if (password !== undefined && password !== '') {
-				hashedPassword = await this.passwordService.hashPassword(password)
+				hashedPassword =
+					await this.passwordService.hashPassword(password)
 			}
 
 			if (roles) {

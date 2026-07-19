@@ -24,7 +24,9 @@ export const protect = async (
 			throw new AppException('Invalid token type!', 401)
 		}
 
-		const decoded = (await authService.verifyToken(token)) as tokenAttributes
+		const decoded = (await authService.verifyToken(
+			token
+		)) as tokenAttributes
 
 		if (!decoded) {
 			return next(new AppException('Invalid token!', 401))

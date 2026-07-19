@@ -3,7 +3,11 @@ class AppException extends Error {
 	errorMessage: string
 	errorValidations?: object
 
-	constructor(message: string, statusCode: number, errorValidations?: object) {
+	constructor(
+		message: string,
+		statusCode: number,
+		errorValidations?: object
+	) {
 		super(message)
 
 		// Manually set the prototype for proper inheritance

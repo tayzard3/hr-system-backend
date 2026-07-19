@@ -7,14 +7,17 @@ import { DEFAULT_ROLE } from '../constants'
 
 @injectable()
 export class RoleController {
-	constructor(@inject(TYPES.IRoleService) private roleService: IRoleService) {}
+	constructor(
+		@inject(TYPES.IRoleService) private roleService: IRoleService
+	) {}
 
 	public getAllRoles = asyncHandler(async (req: Request, res: Response) => {
 		const options = {
 			page: parseInt(req.query.page as string, 10) || 1,
 			perPage: parseInt(req.query.perPage as string, 10),
 			keyword: req.query.keyword as string | undefined,
-			isDeveloper: req.user.roles.includes(DEFAULT_ROLE.DEVELOPER) || false,
+			isDeveloper:
+				req.user.roles.includes(DEFAULT_ROLE.DEVELOPER) || false,
 		}
 
 		const roles = await this.roleService.getAllRoles(options)

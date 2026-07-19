@@ -24,7 +24,10 @@ class Log {
 		if (logTo === 'console') {
 			logTransports.push(
 				new transports.Console({
-					format: format.combine(format.timestamp(), format.prettyPrint()),
+					format: format.combine(
+						format.timestamp(),
+						format.prettyPrint()
+					),
 				})
 			)
 		}
@@ -39,7 +42,10 @@ class Log {
 					maxFiles: options?.maxFiles || '30d',
 					format:
 						options?.format ||
-						format.combine(format.timestamp(), format.prettyPrint()),
+						format.combine(
+							format.timestamp(),
+							format.prettyPrint()
+						),
 				})
 			)
 		}

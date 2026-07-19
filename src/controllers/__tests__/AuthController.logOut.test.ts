@@ -48,7 +48,9 @@ describe('POST /logout', () => {
 	})
 
 	it('returns 422 (validation error) when refreshToken is an empty string', async () => {
-		const res = await request(app).post('/logout').send({ refreshToken: '' })
+		const res = await request(app)
+			.post('/logout')
+			.send({ refreshToken: '' })
 
 		expect(res.body.statusCode).toBe(422)
 		expect(authServiceMock.logout).not.toHaveBeenCalled()

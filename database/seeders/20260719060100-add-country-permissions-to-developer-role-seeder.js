@@ -39,7 +39,9 @@ module.exports = {
 		)
 
 		const newRolePermissions = permissions
-			.filter((permission) => !existingPermissionIds.includes(permission.id))
+			.filter(
+				(permission) => !existingPermissionIds.includes(permission.id)
+			)
 			.map((permission) => {
 				return {
 					permission_id: permission.id,

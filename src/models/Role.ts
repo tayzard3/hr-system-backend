@@ -43,7 +43,10 @@ export class Role extends Model<
 		})
 	}
 
-	declare addPermissions: BelongsToManyAddAssociationsMixin<Permission, number>
+	declare addPermissions: BelongsToManyAddAssociationsMixin<
+		Permission,
+		number
+	>
 	declare setPermissions: HasManySetAssociationsMixin<Permission, number>
 }
 

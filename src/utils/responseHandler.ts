@@ -40,7 +40,12 @@ export const responseHandler = <T>(
 	statusCode: number,
 	responseData: ResponseData<T>
 ): Response => {
-	return sendApiResponse(res, statusCode, responseData.message, responseData.data)
+	return sendApiResponse(
+		res,
+		statusCode,
+		responseData.message,
+		responseData.data
+	)
 }
 
 type AsyncController<T> = (

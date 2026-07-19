@@ -1,48 +1,48 @@
 services:
-  app:
-    build: .
-    ports:
-      - '${SERVER_PORT:-3000}:3000'
-    env_file:
-      - .env
-    environment:
-      DEV_DB_CONNECTION: mysql
-      DEV_DB_HOST: mysql
-      DEV_DB_DATABASE: ${DEV_DB_DATABASE:-hr_system}
-      DEV_DB_USERNAME: ${DEV_DB_USERNAME:-hr_system}
-      DEV_DB_PASSWORD: ${DEV_DB_PASSWORD:-hr_system}
-    depends_on:
-      mysql:
-        condition: service_healthy
-    restart: unless-stopped
+    app:
+        build: .
+        ports:
+            - '${SERVER_PORT:-3000}:3000'
+        env_file:
+            - .env
+        environment:
+            DEV_DB_CONNECTION: mysql
+            DEV_DB_HOST: mysql
+            DEV_DB_DATABASE: ${DEV_DB_DATABASE:-hr_system}
+            DEV_DB_USERNAME: ${DEV_DB_USERNAME:-hr_system}
+            DEV_DB_PASSWORD: ${DEV_DB_PASSWORD:-hr_system}
+        depends_on:
+            mysql:
+                condition: service_healthy
+        restart: unless-stopped
 
-  mysql:
-    image: mysql:8.4
-    environment:
-      MYSQL_DATABASE: ${DEV_DB_DATABASE:-hr_system}
-      MYSQL_USER: ${DEV_DB_USERNAME:-hr_system}
-      MYSQL_PASSWORD: ${DEV_DB_PASSWORD:-hr_system}
-      MYSQL_ROOT_PASSWORD: ${DEV_DB_ROOT_PASSWORD:-root}
-    ports:
-      - '3306:3306'
-    volumes:
-      - mysql_data:/var/lib/mysql
-    healthcheck:
-      test:
-        [
-          'CMD',
-          'mysqladmin',
-          'ping',
-          '-h',
-          'localhost',
-          '-u',
-          'root',
-          '-p${DEV_DB_ROOT_PASSWORD:-root}',
-        ]
-      interval: 5s
-      timeout: 5s
-      retries: 10
-    restart: unless-stopped
+    mysql:
+        image: mysql:8.4
+        environment:
+            MYSQL_DATABASE: ${DEV_DB_DATABASE:-hr_system}
+            MYSQL_USER: ${DEV_DB_USERNAME:-hr_system}
+            MYSQL_PASSWORD: ${DEV_DB_PASSWORD:-hr_system}
+            MYSQL_ROOT_PASSWORD: ${DEV_DB_ROOT_PASSWORD:-root}
+        ports:
+            - '3306:3306'
+        volumes:
+            - mysql_data:/var/lib/mysql
+        healthcheck:
+            test:
+                [
+                    'CMD',
+                    'mysqladmin',
+                    'ping',
+                    '-h',
+                    'localhost',
+                    '-u',
+                    'root',
+                    '-p${DEV_DB_ROOT_PASSWORD:-root}',
+                ]
+            interval: 5s
+            timeout: 5s
+            retries: 10
+        restart: unless-stopped
 
 volumes:
-  mysql_data:
+    mysql_data:

@@ -6,7 +6,9 @@ import { IAuthService } from '../interfaces/service/IAuthService'
 
 @injectable()
 export default class AuthController {
-	constructor(@inject(TYPES.IAuthService) private authService: IAuthService) {}
+	constructor(
+		@inject(TYPES.IAuthService) private authService: IAuthService
+	) {}
 
 	public signIn = asyncHandler(async (req: Request, res: Response) => {
 		const data = await this.authService.signIn(req.body)
@@ -27,15 +29,20 @@ export default class AuthController {
 		})
 	})
 
-	public forgotPassword = asyncHandler(async (req: Request, res: Response) => {
-		const { email, redirectTo } = req.body
-		const data = await this.authService.forgotPassword(email, redirectTo)
+	public forgotPassword = asyncHandler(
+		async (req: Request, res: Response) => {
+			const { email, redirectTo } = req.body
+			const data = await this.authService.forgotPassword(
+				email,
+				redirectTo
+			)
 
-		responseHandler(res, 200, {
-			message: 'Success',
-			data,
-		})
-	})
+			responseHandler(res, 200, {
+				message: 'Success',
+				data,
+			})
+		}
+	)
 
 	public resetPassword = asyncHandler(async (req: Request, res: Response) => {
 		const { id } = req.user

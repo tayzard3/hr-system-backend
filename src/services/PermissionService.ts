@@ -66,7 +66,10 @@ export class PermissionService implements IPermissionService {
 			where: { name: name },
 		})
 		if (existingPermission) {
-			throw new AppException('Permission with this name already exists', 409)
+			throw new AppException(
+				'Permission with this name already exists',
+				409
+			)
 		}
 
 		const permission = await sequelize.transaction(async (transaction) => {
@@ -134,13 +137,11 @@ export class PermissionService implements IPermissionService {
 		return await sequelize.transaction(async (transaction) => {
 			await permission.setRoles(permissionData.roles, { transaction })
 
-			const [, updatedPermissions] = await this.permissionRepository.update(
-				permissionData,
-				{
+			const [, updatedPermissions] =
+				await this.permissionRepository.update(permissionData, {
 					where: { id },
 					returning: true,
-				}
-			)
+				})
 			return updatedPermissions[0] || null
 		})
 	}

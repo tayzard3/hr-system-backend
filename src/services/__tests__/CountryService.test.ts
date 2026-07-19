@@ -74,7 +74,9 @@ describe('CountryService', () => {
 		it('throws 404 when the country does not exist', async () => {
 			countryRepository.findByPk.mockResolvedValue(null)
 
-			await expect(countryService.getCountryById(999)).rejects.toMatchObject({
+			await expect(
+				countryService.getCountryById(999)
+			).rejects.toMatchObject({
 				message: 'Country not found',
 				statusCode: 404,
 			})

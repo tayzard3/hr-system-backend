@@ -68,9 +68,7 @@ container.bind<RoleController>(TYPES.RoleController).to(RoleController)
 container
 	.bind<PermissionController>(TYPES.PermissionController)
 	.to(PermissionController)
-container
-	.bind<CountryController>(TYPES.CountryController)
-	.to(CountryController)
+container.bind<CountryController>(TYPES.CountryController).to(CountryController)
 
 // container.bind<boolean>('DEBUG').toConstantValue(true)
 

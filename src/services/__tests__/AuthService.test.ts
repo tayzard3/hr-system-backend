@@ -99,8 +99,14 @@ describe('AuthService', () => {
 			userRepository.findByEmail.mockResolvedValue(null)
 
 			await expect(
-				authService.signIn({ email: 'nobody@example.com', password: 'x' } as never)
-			).rejects.toMatchObject({ message: 'Invalid email or password!', statusCode: 401 })
+				authService.signIn({
+					email: 'nobody@example.com',
+					password: 'x',
+				} as never)
+			).rejects.toMatchObject({
+				message: 'Invalid email or password!',
+				statusCode: 401,
+			})
 		})
 
 		it('throws 401 when the password does not match', async () => {
@@ -108,7 +114,10 @@ describe('AuthService', () => {
 			passwordService.verifyPassword.mockResolvedValue(false)
 
 			await expect(
-				authService.signIn({ email: activeUser.email, password: 'wrong' } as never)
+				authService.signIn({
+					email: activeUser.email,
+					password: 'wrong',
+				} as never)
 			).rejects.toMatchObject({ statusCode: 401 })
 		})
 
@@ -120,7 +129,10 @@ describe('AuthService', () => {
 			passwordService.verifyPassword.mockResolvedValue(true)
 
 			await expect(
-				authService.signIn({ email: activeUser.email, password: 'x' } as never)
+				authService.signIn({
+					email: activeUser.email,
+					password: 'x',
+				} as never)
 			).rejects.toMatchObject({ statusCode: 403 })
 		})
 
@@ -154,7 +166,8 @@ describe('AuthService', () => {
 				}),
 				expect.objectContaining({ transaction: undefined })
 			)
-			const createCallArg = refreshTokenRepository.create.mock.calls[0][0] as {
+			const createCallArg = refreshTokenRepository.create.mock
+				.calls[0][0] as {
 				tokenHash: string
 			}
 			expect(createCallArg.tokenHash).not.toEqual(result!.refreshToken)
@@ -166,7 +179,10 @@ describe('AuthService', () => {
 			refreshTokenRepository.create.mockResolvedValue(undefined)
 
 			await expect(
-				authService.signIn({ email: activeUser.email, password: 'correct' } as never)
+				authService.signIn({
+					email: activeUser.email,
+					password: 'correct',
+				} as never)
 			).rejects.toMatchObject({ statusCode: 500 })
 		})
 	})
@@ -175,7 +191,9 @@ describe('AuthService', () => {
 		it('throws 401 when the token hash is not found', async () => {
 			refreshTokenRepository.findByTokenHash.mockResolvedValue(null)
 
-			await expect(authService.refreshToken('unknown-token')).rejects.toMatchObject({
+			await expect(
+				authService.refreshToken('unknown-token')
+			).rejects.toMatchObject({
 				message: 'Invalid refresh token!',
 				statusCode: 401,
 			})
@@ -189,13 +207,15 @@ describe('AuthService', () => {
 				expiresAt: new Date(Date.now() + 1000 * 60),
 			} as never)
 
-			await expect(authService.refreshToken('stolen-token')).rejects.toMatchObject({
+			await expect(
+				authService.refreshToken('stolen-token')
+			).rejects.toMatchObject({
 				statusCode: 401,
 			})
 
-			expect(refreshTokenRepository.revokeAllActiveForUser).toHaveBeenCalledWith(
-				activeUser.id
-			)
+			expect(
+				refreshTokenRepository.revokeAllActiveForUser
+			).toHaveBeenCalledWith(activeUser.id)
 		})
 
 		it('throws 401 when the token has expired', async () => {
@@ -206,7 +226,9 @@ describe('AuthService', () => {
 				expiresAt: new Date(Date.now() - 1000),
 			} as never)
 
-			await expect(authService.refreshToken('expired-token')).rejects.toMatchObject({
+			await expect(
+				authService.refreshToken('expired-token')
+			).rejects.toMatchObject({
 				message: 'Refresh token has expired!',
 				statusCode: 401,
 			})
@@ -221,7 +243,9 @@ describe('AuthService', () => {
 			} as never)
 			userRepository.findByPk.mockResolvedValue(null)
 
-			await expect(authService.refreshToken('orphaned-token')).rejects.toMatchObject({
+			await expect(
+				authService.refreshToken('orphaned-token')
+			).rejects.toMatchObject({
 				message: 'Invalid refresh token!',
 				statusCode: 401,
 			})
@@ -239,7 +263,9 @@ describe('AuthService', () => {
 				status: USER_STATUS.INACTIVE,
 			} as never)
 
-			await expect(authService.refreshToken('valid-token')).rejects.toMatchObject({
+			await expect(
+				authService.refreshToken('valid-token')
+			).rejects.toMatchObject({
 				statusCode: 403,
 			})
 		})
@@ -251,7 +277,9 @@ describe('AuthService', () => {
 				revokedAt: null,
 				expiresAt: new Date(Date.now() + 1000 * 60),
 			}
-			refreshTokenRepository.findByTokenHash.mockResolvedValue(existingToken as never)
+			refreshTokenRepository.findByTokenHash.mockResolvedValue(
+				existingToken as never
+			)
 			userRepository.findByPk.mockResolvedValue(activeUser as never)
 			refreshTokenRepository.create.mockResolvedValue({
 				id: 11,
@@ -298,7 +326,9 @@ describe('AuthService', () => {
 		it('is a no-op (still resolves) when the token is unknown', async () => {
 			refreshTokenRepository.findByTokenHash.mockResolvedValue(null)
 
-			await expect(authService.logout('unknown-token')).resolves.toBeUndefined()
+			await expect(
+				authService.logout('unknown-token')
+			).resolves.toBeUndefined()
 
 			expect(refreshTokenRepository.revoke).not.toHaveBeenCalled()
 		})
@@ -311,7 +341,9 @@ describe('AuthService', () => {
 				expiresAt: new Date(Date.now() + 1000 * 60),
 			} as never)
 
-			await expect(authService.logout('already-used-token')).resolves.toBeUndefined()
+			await expect(
+				authService.logout('already-used-token')
+			).resolves.toBeUndefined()
 
 			expect(refreshTokenRepository.revoke).not.toHaveBeenCalled()
 		})

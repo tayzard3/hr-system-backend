@@ -22,7 +22,10 @@ router
 	)
 router
 	.route('/:id')
-	.get(can(PERMISSION_PERMISSION.LIST), permissionController.getPermissionById)
+	.get(
+		can(PERMISSION_PERMISSION.LIST),
+		permissionController.getPermissionById
+	)
 	.post(
 		can(PERMISSION_PERMISSION.UPDATE),
 		permissionController.updatePermission

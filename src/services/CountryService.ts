@@ -46,7 +46,9 @@ export class CountryService implements ICountryService {
 		return this.countryRepository.find(queryOptions as FindOptions)
 	}
 
-	public async createCountry(countryData: CreateCountryDTO): Promise<Country> {
+	public async createCountry(
+		countryData: CreateCountryDTO
+	): Promise<Country> {
 		const code = countryData.code.toUpperCase()
 
 		const existingCountry = await this.countryRepository.findByCode(code)
@@ -91,9 +93,13 @@ export class CountryService implements ICountryService {
 
 		if (updateData.code) {
 			const code = updateData.code.toUpperCase()
-			const existingCountry = await this.countryRepository.findByCode(code)
+			const existingCountry =
+				await this.countryRepository.findByCode(code)
 			if (existingCountry && existingCountry.id !== id) {
-				throw new AppException('Country with this code already exists', 409)
+				throw new AppException(
+					'Country with this code already exists',
+					409
+				)
 			}
 			updateData.code = code
 		}

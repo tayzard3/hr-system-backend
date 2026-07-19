@@ -48,7 +48,11 @@ app.get('/_health', (req, res) => {
 app.use('/api', routes)
 
 app.use((req, res) => {
-	sendApiResponse(res, 404, `Route not found: ${req.method} ${req.originalUrl}`)
+	sendApiResponse(
+		res,
+		404,
+		`Route not found: ${req.method} ${req.originalUrl}`
+	)
 })
 
 app.use(globalErrorHandler)

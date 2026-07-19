@@ -47,7 +47,9 @@ describe('POST /refresh-token', () => {
 	})
 
 	it('returns 422 (validation error) when refreshToken is an empty string', async () => {
-		const res = await request(app).post('/refresh-token').send({ refreshToken: '' })
+		const res = await request(app)
+			.post('/refresh-token')
+			.send({ refreshToken: '' })
 
 		expect(res.body.statusCode).toBe(422)
 		expect(authServiceMock.refreshToken).not.toHaveBeenCalled()
@@ -66,7 +68,9 @@ describe('POST /refresh-token', () => {
 			.post('/refresh-token')
 			.send({ refreshToken: 'valid-raw-token' })
 
-		expect(authServiceMock.refreshToken).toHaveBeenCalledWith('valid-raw-token')
+		expect(authServiceMock.refreshToken).toHaveBeenCalledWith(
+			'valid-raw-token'
+		)
 		expect(res.body.statusCode).toBe(200)
 		expect(res.body.isSuccess).toBe(true)
 		expect(res.body.data.accessToken).toBe('new-access-token')

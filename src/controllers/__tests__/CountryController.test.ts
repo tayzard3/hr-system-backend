@@ -32,15 +32,13 @@ describe('CountryController', () => {
 
 		app = express()
 		app.use(express.json())
-		app
-			.route('/countries')
+		app.route('/countries')
 			.get(countryController.getAllCountries)
 			.post(
 				zodSchemaValidator(createCountrySchema),
 				countryController.createCountry
 			)
-		app
-			.route('/countries/:id')
+		app.route('/countries/:id')
 			.get(countryController.getCountryById)
 			.post(
 				zodSchemaValidator(updateCountrySchema),
@@ -52,7 +50,9 @@ describe('CountryController', () => {
 
 	describe('GET /countries', () => {
 		it('returns the list of countries', async () => {
-			countryServiceMock.getAllCountries.mockResolvedValue([singapore] as never)
+			countryServiceMock.getAllCountries.mockResolvedValue([
+				singapore,
+			] as never)
 
 			const res = await request(app).get('/countries')
 
@@ -73,14 +73,18 @@ describe('CountryController', () => {
 		})
 
 		it('returns 422 when name is missing', async () => {
-			const res = await request(app).post('/countries').send({ code: 'SG' })
+			const res = await request(app)
+				.post('/countries')
+				.send({ code: 'SG' })
 
 			expect(res.body.statusCode).toBe(422)
 			expect(countryServiceMock.createCountry).not.toHaveBeenCalled()
 		})
 
 		it('creates the country and returns 201 on success', async () => {
-			countryServiceMock.createCountry.mockResolvedValue(singapore as never)
+			countryServiceMock.createCountry.mockResolvedValue(
+				singapore as never
+			)
 
 			const res = await request(app)
 				.post('/countries')
@@ -108,13 +112,17 @@ describe('CountryController', () => {
 
 			expect(res.body.statusCode).toBe(409)
 			expect(res.body.isSuccess).toBe(false)
-			expect(res.body.message).toBe('Country with this code already exists')
+			expect(res.body.message).toBe(
+				'Country with this code already exists'
+			)
 		})
 	})
 
 	describe('GET /countries/:id', () => {
 		it('returns the country when found', async () => {
-			countryServiceMock.getCountryById.mockResolvedValue(singapore as never)
+			countryServiceMock.getCountryById.mockResolvedValue(
+				singapore as never
+			)
 
 			const res = await request(app).get('/countries/1')
 

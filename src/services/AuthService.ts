@@ -123,7 +123,8 @@ class AuthService implements IAuthService {
 			user?.password || ''
 		)
 
-		if (!checkPass) throw new AppException('Invalid email or password!', 401)
+		if (!checkPass)
+			throw new AppException('Invalid email or password!', 401)
 
 		this.assertActiveUser(user.status)
 
@@ -256,7 +257,10 @@ class AuthService implements IAuthService {
 		}
 	}
 
-	public async resetPassword(userId: number, password: string): Promise<void> {
+	public async resetPassword(
+		userId: number,
+		password: string
+	): Promise<void> {
 		const hashedPassword = await this.passwordService.hashPassword(password)
 
 		const [affectedCount] = await this.userRepository.update(

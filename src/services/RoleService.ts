@@ -109,17 +109,23 @@ export class RoleService implements IRoleService {
 				where: { name: name },
 			})
 			if (existingRole && existingRole.id !== id) {
-				throw new AppException('Role with this name already exists', 409)
+				throw new AppException(
+					'Role with this name already exists',
+					409
+				)
 			}
 		}
 		return await sequelize.transaction(async (transaction) => {
 			await role.setPermissions(permissions, { transaction })
 
-			const [, updatedRoles] = await this.roleRepository.update(roleData, {
-				where: { id },
-				returning: true,
-				transaction,
-			})
+			const [, updatedRoles] = await this.roleRepository.update(
+				roleData,
+				{
+					where: { id },
+					returning: true,
+					transaction,
+				}
+			)
 			return updatedRoles[0] || null
 		})
 	}

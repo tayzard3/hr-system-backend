@@ -6,7 +6,9 @@ import { TYPES } from '../containers/inversifyTypes'
 
 @injectable()
 export default class UserController {
-	constructor(@inject(TYPES.IUserService) private userService: IUserService) {}
+	constructor(
+		@inject(TYPES.IUserService) private userService: IUserService
+	) {}
 
 	public getAllUsers = asyncHandler(async (req: Request, res: Response) => {
 		const options = {

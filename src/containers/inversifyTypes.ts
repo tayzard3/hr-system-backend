@@ -8,6 +8,7 @@ export const TYPES = {
 	IUserRepository: Symbol.for('IUserRepository'),
 	IRoleRepository: Symbol.for('IRoleRepository'),
 	IPermissionRepository: Symbol.for('IPermissionRepository'),
+	IRefreshTokenRepository: Symbol.for('IRefreshTokenRepository'),
 
 	/** Service */
 	IUserService: Symbol.for('IUserService'),

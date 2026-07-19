@@ -2,6 +2,7 @@ import express from 'express'
 import zodSchemaValidator from '../../validation/zodValidator'
 import {
 	forgetPasswordSchema,
+	refreshTokenSchema,
 	resetPasswordSchema,
 	signInSchema,
 } from '../../validation/authSchema'
@@ -17,6 +18,9 @@ router
 	.route('/sign-in')
 	.post(zodSchemaValidator(signInSchema), authController.signIn)
 router
+	.route('/refresh-token')
+	.post(zodSchemaValidator(refreshTokenSchema), authController.refreshToken)
+router
 	.route('/forget-password')
 	.post(
 		zodSchemaValidator(forgetPasswordSchema),
@@ -30,7 +34,9 @@ router
 		authController.resetPassword
 	)
 router.route('/me').get(protect, authController.getMe)
-router.route('/logout').post(authController.logOut)
+router
+	.route('/logout')
+	.post(zodSchemaValidator(refreshTokenSchema), authController.logOut)
 
 const authRoutes = router
 export default authRoutes

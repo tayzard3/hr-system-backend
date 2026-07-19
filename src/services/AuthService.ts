@@ -1,11 +1,14 @@
 import { injectable, inject } from 'inversify'
 import { InferAttributes, QueryTypes, Transaction } from 'sequelize'
+import crypto from 'crypto'
 import AppException from '../exceptions/AppException'
 import { sequelize } from '../models'
 import { User } from '../models/User'
+import { RefreshToken } from '../models/RefreshToken'
 import appConfig from '../utils/config'
 import jwt from 'jsonwebtoken'
 import { IUserRepository } from '../interfaces/repository/IUserRepository'
+import { IRefreshTokenRepository } from '../interfaces/repository/IRefreshTokenRepository'
 import { TYPES } from '../containers/inversifyTypes'
 import { IPasswordService } from '../interfaces/repository/IPasswordService'
 import { IAuthService } from '../interfaces/service/IAuthService'
@@ -13,16 +16,88 @@ import { USER_STATUS } from '../constants'
 import { IEmailService } from '../interfaces/service/IEmailService'
 import { SendGridEmailOptions } from '../utils/Email'
 import { UserWithRelations } from '../types/userTypes'
+import { refreshTokenResponseType } from '../types/authServiceTypes'
+
+interface IssuedTokenPair {
+	accessToken: string
+	accessTokenExpiresAt: Date
+	refreshToken: string
+	refreshTokenExpiresAt: Date
+	refreshTokenRecord: RefreshToken
+}
 
 @injectable()
 class AuthService implements IAuthService {
 	constructor(
 		@inject(TYPES.IUserRepository)
 		private userRepository: IUserRepository,
+		@inject(TYPES.IRefreshTokenRepository)
+		private refreshTokenRepository: IRefreshTokenRepository,
 		@inject(TYPES.IPasswordService)
 		private passwordService: IPasswordService,
 		@inject(TYPES.IEmailService) private emailService: IEmailService
 	) {}
+
+	/** SHA-256 digest used to look up/store refresh tokens without persisting the raw secret. */
+	private hashRefreshToken(rawToken: string): string {
+		return crypto.createHash('sha256').update(rawToken).digest('hex')
+	}
+
+	private assertActiveUser(status: string): void {
+		if (status !== USER_STATUS.ACTIVE) {
+			throw new AppException(
+				'Account not yet active. Please contact your support!',
+				403
+			)
+		}
+	}
+
+	/**
+	 * Issues a new access token (JWT) and a new opaque refresh token (persisted as a hash)
+	 * for the given user. Accepts an optional transaction so callers rotating an existing
+	 * refresh token can wrap the create + revoke in a single atomic write.
+	 */
+	private async issueTokenPair(
+		userId: number,
+		transaction?: Transaction
+	): Promise<IssuedTokenPair> {
+		const accessTokenExpiresInSeconds =
+			appConfig.JWT_ACCESS_TOKEN_EXPIRES_IN_SECONDS
+		const accessToken = jwt.sign({ userId }, appConfig.JWT_SECRET, {
+			expiresIn: accessTokenExpiresInSeconds,
+		})
+		const accessTokenExpiresAt = new Date(
+			Date.now() + accessTokenExpiresInSeconds * 1000
+		)
+
+		const rawRefreshToken = crypto.randomBytes(64).toString('hex')
+		const refreshTokenExpiresInSeconds =
+			appConfig.JWT_REFRESH_TOKEN_EXPIRES_IN_SECONDS
+		const refreshTokenExpiresAt = new Date(
+			Date.now() + refreshTokenExpiresInSeconds * 1000
+		)
+
+		const refreshTokenRecord = await this.refreshTokenRepository.create(
+			{
+				userId,
+				tokenHash: this.hashRefreshToken(rawRefreshToken),
+				expiresAt: refreshTokenExpiresAt,
+			},
+			{ transaction }
+		)
+
+		if (!refreshTokenRecord) {
+			throw new AppException('Failed to issue refresh token!', 500)
+		}
+
+		return {
+			accessToken,
+			accessTokenExpiresAt,
+			refreshToken: rawRefreshToken,
+			refreshTokenExpiresAt,
+			refreshTokenRecord,
+		}
+	}
 
 	public async verifyToken(token: string) {
 		try {
@@ -50,22 +125,90 @@ class AuthService implements IAuthService {
 
 		if (!checkPass) throw new AppException('Invalid email or password!', 401)
 
-		if (user.status !== USER_STATUS.ACTIVE) {
-			throw new AppException(
-				'Account not yet active. Please contact your support!',
-				403
-			)
-		}
+		this.assertActiveUser(user.status)
 
-		const jwtPayload = {
-			userId: user.id,
-		}
-
-		const token = jwt.sign(jwtPayload, appConfig.JWT_SECRET)
+		const { refreshTokenRecord: _refreshTokenRecord, ...tokens } =
+			await this.issueTokenPair(user.id)
 
 		return {
 			user: { name: user.name, email: user.email },
-			accessToken: token,
+			...tokens,
+		}
+	}
+
+	/**
+	 * Rotates a refresh token: validates the presented raw token against its stored hash,
+	 * rejects it if expired/already revoked, then atomically revokes it and issues a new
+	 * access + refresh token pair (revoke + create happen in a single transaction so a
+	 * failure never leaves a token both "used" and without a replacement).
+	 */
+	public async refreshToken(
+		rawRefreshToken: string
+	): Promise<refreshTokenResponseType> {
+		const tokenHash = this.hashRefreshToken(rawRefreshToken)
+
+		const existingToken =
+			await this.refreshTokenRepository.findByTokenHash(tokenHash)
+
+		if (!existingToken) {
+			throw new AppException('Invalid refresh token!', 401)
+		}
+
+		if (existingToken.revokedAt) {
+			// A previously-revoked/rotated token being presented again is a strong signal
+			// of token theft — defensively revoke every other active token for this user.
+			await this.refreshTokenRepository.revokeAllActiveForUser(
+				existingToken.userId
+			)
+
+			throw new AppException(
+				'Refresh token has already been used or revoked!',
+				401
+			)
+		}
+
+		if (existingToken.expiresAt.getTime() < Date.now()) {
+			throw new AppException('Refresh token has expired!', 401)
+		}
+
+		const user = await this.userRepository.findByPk(existingToken.userId)
+
+		if (!user) {
+			throw new AppException('Invalid refresh token!', 401)
+		}
+
+		this.assertActiveUser(user.status)
+
+		return await sequelize.transaction(async (t: Transaction) => {
+			const { refreshTokenRecord, ...tokens } = await this.issueTokenPair(
+				user.id,
+				t
+			)
+
+			await this.refreshTokenRepository.revoke(
+				existingToken.id,
+				refreshTokenRecord.id,
+				t
+			)
+
+			return tokens
+		})
+	}
+
+	/**
+	 * Server-side revocation for logout: looks the presented raw token up by its hash and
+	 * revokes it if it's currently active. Deliberately idempotent and silent on an
+	 * unknown/already-revoked/expired token — a client calling logout twice, or with a stale
+	 * token, still gets a success response, and this endpoint never reveals whether a given
+	 * refresh token exists. No transaction needed: a single conditional write.
+	 */
+	public async logout(rawRefreshToken: string): Promise<void> {
+		const tokenHash = this.hashRefreshToken(rawRefreshToken)
+		const existingToken =
+			await this.refreshTokenRepository.findByTokenHash(tokenHash)
+
+		if (existingToken && !existingToken.revokedAt) {
+			await this.refreshTokenRepository.revoke(existingToken.id, null)
 		}
 	}
 

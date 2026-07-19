@@ -26,3 +26,10 @@ export const PERMISSION_PERMISSION = Object.freeze({
 	UPDATE: 'Permission_Update',
 	DELETE: 'Permission_Delete',
 })
+
+export const COUNTRY_PERMISSION = Object.freeze({
+	LIST: 'Country_List',
+	CREATE: 'Country_Create',
+	UPDATE: 'Country_Update',
+	DELETE: 'Country_Delete',
+})

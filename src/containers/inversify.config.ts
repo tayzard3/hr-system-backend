@@ -25,6 +25,11 @@ import { IEmailService } from '../interfaces/service/IEmailService'
 import { SendGridEmailService } from '../services/EmailService'
 import { IRefreshTokenRepository } from '../interfaces/repository/IRefreshTokenRepository'
 import { RefreshTokenRepository } from '../repositories/RefreshTokenRepository'
+import { ICountryRepository } from '../interfaces/repository/ICountryRepository'
+import { CountryRepository } from '../repositories/CountryRepository'
+import { ICountryService } from '../interfaces/service/ICountryService'
+import { CountryService } from '../services/CountryService'
+import { CountryController } from '../controllers/CountryController'
 
 const container = new Container()
 
@@ -39,6 +44,9 @@ container
 container
 	.bind<IRefreshTokenRepository>(TYPES.IRefreshTokenRepository)
 	.to(RefreshTokenRepository)
+container
+	.bind<ICountryRepository>(TYPES.ICountryRepository)
+	.to(CountryRepository)
 
 /** Service */
 container.bind<IUserService>(TYPES.IUserService).to(UserService)
@@ -47,6 +55,7 @@ container.bind<IRoleService>(TYPES.IRoleService).to(RoleService)
 container
 	.bind<IPermissionService>(TYPES.IPermissionService)
 	.to(PermissionService)
+container.bind<ICountryService>(TYPES.ICountryService).to(CountryService)
 
 // Bind SendGridEmailService or SMTPEmailService to email service
 container.bind<IEmailService>(TYPES.IEmailService).to(SendGridEmailService)
@@ -59,6 +68,9 @@ container.bind<RoleController>(TYPES.RoleController).to(RoleController)
 container
 	.bind<PermissionController>(TYPES.PermissionController)
 	.to(PermissionController)
+container
+	.bind<CountryController>(TYPES.CountryController)
+	.to(CountryController)
 
 // container.bind<boolean>('DEBUG').toConstantValue(true)
 

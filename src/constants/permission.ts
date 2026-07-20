@@ -49,3 +49,11 @@ export const RESOURCE_ROLE_TYPE_PERMISSION = Object.freeze({
 	UPDATE: 'ResourceRoleType_Update',
 	DELETE: 'ResourceRoleType_Delete',
 })
+
+export const TIMESHEET_PERIOD_PERMISSION = Object.freeze({
+	LIST: 'TimesheetPeriod_List',
+	CREATE: 'TimesheetPeriod_Create',
+	LOCK: 'TimesheetPeriod_Lock',
+	UNLOCK: 'TimesheetPeriod_Unlock',
+	DELETE: 'TimesheetPeriod_Delete',
+})

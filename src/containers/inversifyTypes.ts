@@ -15,6 +15,7 @@ export const TYPES = {
 	IProjectResourceAssignmentRepository: Symbol.for(
 		'IProjectResourceAssignmentRepository'
 	),
+	ITimesheetPeriodRepository: Symbol.for('ITimesheetPeriodRepository'),
 
 	/** Service */
 	IUserService: Symbol.for('IUserService'),
@@ -29,6 +30,7 @@ export const TYPES = {
 	IProjectResourceAssignmentService: Symbol.for(
 		'IProjectResourceAssignmentService'
 	),
+	ITimesheetPeriodService: Symbol.for('ITimesheetPeriodService'),
 
 	/** Controller */
 	UserController: Symbol.for('UserController'),
@@ -38,4 +40,5 @@ export const TYPES = {
 	CountryController: Symbol.for('CountryController'),
 	ProjectController: Symbol.for('ProjectController'),
 	ResourceRoleTypeController: Symbol.for('ResourceRoleTypeController'),
+	TimesheetPeriodController: Symbol.for('TimesheetPeriodController'),
 }

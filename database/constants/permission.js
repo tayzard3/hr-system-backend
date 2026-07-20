@@ -1,6 +1,7 @@
 'use strict'
 Object.defineProperty(exports, '__esModule', { value: true })
-exports.RESOURCE_ROLE_TYPE_PERMISSION =
+exports.TIMESHEET_PERIOD_PERMISSION =
+	exports.RESOURCE_ROLE_TYPE_PERMISSION =
 	exports.PROJECT_PERMISSION =
 	exports.COUNTRY_PERMISSION =
 	exports.PERMISSION_PERMISSION =
@@ -52,5 +53,12 @@ exports.RESOURCE_ROLE_TYPE_PERMISSION = Object.freeze({
 	CREATE: 'ResourceRoleType_Create',
 	UPDATE: 'ResourceRoleType_Update',
 	DELETE: 'ResourceRoleType_Delete',
+})
+exports.TIMESHEET_PERIOD_PERMISSION = Object.freeze({
+	LIST: 'TimesheetPeriod_List',
+	CREATE: 'TimesheetPeriod_Create',
+	LOCK: 'TimesheetPeriod_Lock',
+	UNLOCK: 'TimesheetPeriod_Unlock',
+	DELETE: 'TimesheetPeriod_Delete',
 })
 //# sourceMappingURL=permission.js.map

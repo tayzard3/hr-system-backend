@@ -16,6 +16,7 @@ import {
 	ProjectResourceAssignmentModel,
 	initProjectResourceAssignment,
 } from './ProjectResourceAssignment'
+import { TimesheetPeriodModel, initTimesheetPeriod } from './TimesheetPeriod'
 
 const env = process.env.NODE_ENV || 'development'
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -68,6 +69,7 @@ db.Country = initCountry(sequelize)
 db.Project = initProject(sequelize)
 db.ResourceRoleType = initResourceRoleType(sequelize)
 db.ProjectResourceAssignment = initProjectResourceAssignment(sequelize)
+db.TimesheetPeriod = initTimesheetPeriod(sequelize)
 
 Object.keys(db).forEach((modelName) => {
 	if (db[modelName].associate) {
@@ -84,5 +86,6 @@ export const Project = db.Project as ProjectModel
 export const ResourceRoleType = db.ResourceRoleType as ResourceRoleTypeModel
 export const ProjectResourceAssignment =
 	db.ProjectResourceAssignment as ProjectResourceAssignmentModel
+export const TimesheetPeriod = db.TimesheetPeriod as TimesheetPeriodModel
 
 export default db

@@ -44,6 +44,11 @@ import { IProjectResourceAssignmentRepository } from '../interfaces/repository/I
 import { ProjectResourceAssignmentRepository } from '../repositories/ProjectResourceAssignmentRepository'
 import { IProjectResourceAssignmentService } from '../interfaces/service/IProjectResourceAssignmentService'
 import { ProjectResourceAssignmentService } from '../services/ProjectResourceAssignmentService'
+import { ITimesheetPeriodRepository } from '../interfaces/repository/ITimesheetPeriodRepository'
+import { TimesheetPeriodRepository } from '../repositories/TimesheetPeriodRepository'
+import { ITimesheetPeriodService } from '../interfaces/service/ITimesheetPeriodService'
+import { TimesheetPeriodService } from '../services/TimesheetPeriodService'
+import { TimesheetPeriodController } from '../controllers/TimesheetPeriodController'
 
 const container = new Container()
 
@@ -72,6 +77,9 @@ container
 		TYPES.IProjectResourceAssignmentRepository
 	)
 	.to(ProjectResourceAssignmentRepository)
+container
+	.bind<ITimesheetPeriodRepository>(TYPES.ITimesheetPeriodRepository)
+	.to(TimesheetPeriodRepository)
 
 /** Service */
 container.bind<IUserService>(TYPES.IUserService).to(UserService)
@@ -90,6 +98,9 @@ container
 		TYPES.IProjectResourceAssignmentService
 	)
 	.to(ProjectResourceAssignmentService)
+container
+	.bind<ITimesheetPeriodService>(TYPES.ITimesheetPeriodService)
+	.to(TimesheetPeriodService)
 
 // Bind SendGridEmailService or SMTPEmailService to email service
 container.bind<IEmailService>(TYPES.IEmailService).to(SendGridEmailService)
@@ -107,6 +118,9 @@ container.bind<ProjectController>(TYPES.ProjectController).to(ProjectController)
 container
 	.bind<ResourceRoleTypeController>(TYPES.ResourceRoleTypeController)
 	.to(ResourceRoleTypeController)
+container
+	.bind<TimesheetPeriodController>(TYPES.TimesheetPeriodController)
+	.to(TimesheetPeriodController)
 
 // container.bind<boolean>('DEBUG').toConstantValue(true)
 

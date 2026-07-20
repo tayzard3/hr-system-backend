@@ -44,6 +44,8 @@ exports.PROJECT_PERMISSION = Object.freeze({
 	CREATE: 'Project_Create',
 	UPDATE: 'Project_Update',
 	DELETE: 'Project_Delete',
+	ASSIGN_RESOURCE: 'Project_AssignResource',
+	REMOVE_RESOURCE: 'Project_RemoveResource',
 })
 exports.RESOURCE_ROLE_TYPE_PERMISSION = Object.freeze({
 	LIST: 'ResourceRoleType_List',

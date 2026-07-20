@@ -40,6 +40,10 @@ import { ResourceRoleTypeRepository } from '../repositories/ResourceRoleTypeRepo
 import { IResourceRoleTypeService } from '../interfaces/service/IResourceRoleTypeService'
 import { ResourceRoleTypeService } from '../services/ResourceRoleTypeService'
 import { ResourceRoleTypeController } from '../controllers/ResourceRoleTypeController'
+import { IProjectResourceAssignmentRepository } from '../interfaces/repository/IProjectResourceAssignmentRepository'
+import { ProjectResourceAssignmentRepository } from '../repositories/ProjectResourceAssignmentRepository'
+import { IProjectResourceAssignmentService } from '../interfaces/service/IProjectResourceAssignmentService'
+import { ProjectResourceAssignmentService } from '../services/ProjectResourceAssignmentService'
 
 const container = new Container()
 
@@ -63,6 +67,11 @@ container
 container
 	.bind<IResourceRoleTypeRepository>(TYPES.IResourceRoleTypeRepository)
 	.to(ResourceRoleTypeRepository)
+container
+	.bind<IProjectResourceAssignmentRepository>(
+		TYPES.IProjectResourceAssignmentRepository
+	)
+	.to(ProjectResourceAssignmentRepository)
 
 /** Service */
 container.bind<IUserService>(TYPES.IUserService).to(UserService)
@@ -76,6 +85,11 @@ container.bind<IProjectService>(TYPES.IProjectService).to(ProjectService)
 container
 	.bind<IResourceRoleTypeService>(TYPES.IResourceRoleTypeService)
 	.to(ResourceRoleTypeService)
+container
+	.bind<IProjectResourceAssignmentService>(
+		TYPES.IProjectResourceAssignmentService
+	)
+	.to(ProjectResourceAssignmentService)
 
 // Bind SendGridEmailService or SMTPEmailService to email service
 container.bind<IEmailService>(TYPES.IEmailService).to(SendGridEmailService)

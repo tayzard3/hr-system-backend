@@ -12,6 +12,9 @@ export const TYPES = {
 	ICountryRepository: Symbol.for('ICountryRepository'),
 	IProjectRepository: Symbol.for('IProjectRepository'),
 	IResourceRoleTypeRepository: Symbol.for('IResourceRoleTypeRepository'),
+	IProjectResourceAssignmentRepository: Symbol.for(
+		'IProjectResourceAssignmentRepository'
+	),
 
 	/** Service */
 	IUserService: Symbol.for('IUserService'),
@@ -23,6 +26,9 @@ export const TYPES = {
 	ICountryService: Symbol.for('ICountryService'),
 	IProjectService: Symbol.for('IProjectService'),
 	IResourceRoleTypeService: Symbol.for('IResourceRoleTypeService'),
+	IProjectResourceAssignmentService: Symbol.for(
+		'IProjectResourceAssignmentService'
+	),
 
 	/** Controller */
 	UserController: Symbol.for('UserController'),

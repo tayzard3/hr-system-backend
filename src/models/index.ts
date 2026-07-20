@@ -10,6 +10,7 @@ import { RoleModel, initRole } from './Role'
 import { PermissionModel, initPermission } from './Permission'
 import { RefreshTokenModel, initRefreshToken } from './RefreshToken'
 import { CountryModel, initCountry } from './Country'
+import { ProjectModel, initProject } from './Project'
 
 const env = process.env.NODE_ENV || 'development'
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -59,6 +60,7 @@ db.Role = initRole(sequelize)
 db.Permission = initPermission(sequelize)
 db.RefreshToken = initRefreshToken(sequelize)
 db.Country = initCountry(sequelize)
+db.Project = initProject(sequelize)
 
 Object.keys(db).forEach((modelName) => {
 	if (db[modelName].associate) {
@@ -71,5 +73,6 @@ export const Role = db.Role as RoleModel
 export const Permission = db.Permission as PermissionModel
 export const RefreshToken = db.RefreshToken as RefreshTokenModel
 export const Country = db.Country as CountryModel
+export const Project = db.Project as ProjectModel
 
 export default db

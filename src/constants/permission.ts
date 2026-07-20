@@ -40,3 +40,10 @@ export const PROJECT_PERMISSION = Object.freeze({
 	UPDATE: 'Project_Update',
 	DELETE: 'Project_Delete',
 })
+
+export const RESOURCE_ROLE_TYPE_PERMISSION = Object.freeze({
+	LIST: 'ResourceRoleType_List',
+	CREATE: 'ResourceRoleType_Create',
+	UPDATE: 'ResourceRoleType_Update',
+	DELETE: 'ResourceRoleType_Delete',
+})

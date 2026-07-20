@@ -11,6 +11,7 @@ export const TYPES = {
 	IRefreshTokenRepository: Symbol.for('IRefreshTokenRepository'),
 	ICountryRepository: Symbol.for('ICountryRepository'),
 	IProjectRepository: Symbol.for('IProjectRepository'),
+	IResourceRoleTypeRepository: Symbol.for('IResourceRoleTypeRepository'),
 
 	/** Service */
 	IUserService: Symbol.for('IUserService'),
@@ -21,6 +22,7 @@ export const TYPES = {
 	IPermissionService: Symbol.for('IPermissionService'),
 	ICountryService: Symbol.for('ICountryService'),
 	IProjectService: Symbol.for('IProjectService'),
+	IResourceRoleTypeService: Symbol.for('IResourceRoleTypeService'),
 
 	/** Controller */
 	UserController: Symbol.for('UserController'),
@@ -29,4 +31,5 @@ export const TYPES = {
 	PermissionController: Symbol.for('PermissionController'),
 	CountryController: Symbol.for('CountryController'),
 	ProjectController: Symbol.for('ProjectController'),
+	ResourceRoleTypeController: Symbol.for('ResourceRoleTypeController'),
 }

@@ -35,6 +35,11 @@ import { ProjectRepository } from '../repositories/ProjectRepository'
 import { IProjectService } from '../interfaces/service/IProjectService'
 import { ProjectService } from '../services/ProjectService'
 import { ProjectController } from '../controllers/ProjectController'
+import { IResourceRoleTypeRepository } from '../interfaces/repository/IResourceRoleTypeRepository'
+import { ResourceRoleTypeRepository } from '../repositories/ResourceRoleTypeRepository'
+import { IResourceRoleTypeService } from '../interfaces/service/IResourceRoleTypeService'
+import { ResourceRoleTypeService } from '../services/ResourceRoleTypeService'
+import { ResourceRoleTypeController } from '../controllers/ResourceRoleTypeController'
 
 const container = new Container()
 
@@ -55,6 +60,9 @@ container
 container
 	.bind<IProjectRepository>(TYPES.IProjectRepository)
 	.to(ProjectRepository)
+container
+	.bind<IResourceRoleTypeRepository>(TYPES.IResourceRoleTypeRepository)
+	.to(ResourceRoleTypeRepository)
 
 /** Service */
 container.bind<IUserService>(TYPES.IUserService).to(UserService)
@@ -65,6 +73,9 @@ container
 	.to(PermissionService)
 container.bind<ICountryService>(TYPES.ICountryService).to(CountryService)
 container.bind<IProjectService>(TYPES.IProjectService).to(ProjectService)
+container
+	.bind<IResourceRoleTypeService>(TYPES.IResourceRoleTypeService)
+	.to(ResourceRoleTypeService)
 
 // Bind SendGridEmailService or SMTPEmailService to email service
 container.bind<IEmailService>(TYPES.IEmailService).to(SendGridEmailService)
@@ -79,6 +90,9 @@ container
 	.to(PermissionController)
 container.bind<CountryController>(TYPES.CountryController).to(CountryController)
 container.bind<ProjectController>(TYPES.ProjectController).to(ProjectController)
+container
+	.bind<ResourceRoleTypeController>(TYPES.ResourceRoleTypeController)
+	.to(ResourceRoleTypeController)
 
 // container.bind<boolean>('DEBUG').toConstantValue(true)
 

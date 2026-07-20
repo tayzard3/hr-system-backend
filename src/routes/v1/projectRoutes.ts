@@ -9,6 +9,7 @@ import {
 	createProjectSchema,
 	updateProjectSchema,
 } from '../../validation/projectSchema'
+import { assignResourceSchema } from '../../validation/projectResourceAssignmentSchema'
 
 const router = Router()
 const projectController = container.get<ProjectController>(
@@ -32,5 +33,19 @@ router
 		projectController.updateProject
 	)
 	.delete(can(PROJECT_PERMISSION.DELETE), projectController.deleteProject)
+router
+	.route('/:id/assignments')
+	.get(can(PROJECT_PERMISSION.LIST), projectController.getProjectAssignments)
+	.post(
+		can(PROJECT_PERMISSION.ASSIGN_RESOURCE),
+		zodSchemaValidator(assignResourceSchema),
+		projectController.assignResource
+	)
+router
+	.route('/:id/assignments/:assignmentId')
+	.delete(
+		can(PROJECT_PERMISSION.REMOVE_RESOURCE),
+		projectController.removeResource
+	)
 
 export default router

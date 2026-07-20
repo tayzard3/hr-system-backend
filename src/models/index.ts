@@ -12,6 +12,10 @@ import { RefreshTokenModel, initRefreshToken } from './RefreshToken'
 import { CountryModel, initCountry } from './Country'
 import { ProjectModel, initProject } from './Project'
 import { ResourceRoleTypeModel, initResourceRoleType } from './ResourceRoleType'
+import {
+	ProjectResourceAssignmentModel,
+	initProjectResourceAssignment,
+} from './ProjectResourceAssignment'
 
 const env = process.env.NODE_ENV || 'development'
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -63,6 +67,7 @@ db.RefreshToken = initRefreshToken(sequelize)
 db.Country = initCountry(sequelize)
 db.Project = initProject(sequelize)
 db.ResourceRoleType = initResourceRoleType(sequelize)
+db.ProjectResourceAssignment = initProjectResourceAssignment(sequelize)
 
 Object.keys(db).forEach((modelName) => {
 	if (db[modelName].associate) {
@@ -77,5 +82,7 @@ export const RefreshToken = db.RefreshToken as RefreshTokenModel
 export const Country = db.Country as CountryModel
 export const Project = db.Project as ProjectModel
 export const ResourceRoleType = db.ResourceRoleType as ResourceRoleTypeModel
+export const ProjectResourceAssignment =
+	db.ProjectResourceAssignment as ProjectResourceAssignmentModel
 
 export default db

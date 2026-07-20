@@ -2,11 +2,13 @@ import express, { Application } from 'express'
 import request from 'supertest'
 import { ProjectController } from '../ProjectController'
 import { IProjectService } from '../../interfaces/service/IProjectService'
+import { IProjectResourceAssignmentService } from '../../interfaces/service/IProjectResourceAssignmentService'
 import zodSchemaValidator from '../../validation/zodValidator'
 import {
 	createProjectSchema,
 	updateProjectSchema,
 } from '../../validation/projectSchema'
+import { assignResourceSchema } from '../../validation/projectResourceAssignmentSchema'
 import AppException from '../../exceptions/AppException'
 import { globalErrorHandler } from '../../utils/globalErrorHandler'
 
@@ -16,6 +18,7 @@ import { globalErrorHandler } from '../../utils/globalErrorHandler'
 // (mirrors CountryController.test.ts).
 describe('ProjectController', () => {
 	let projectServiceMock: jest.Mocked<IProjectService>
+	let projectResourceAssignmentServiceMock: jest.Mocked<IProjectResourceAssignmentService>
 	let app: Application
 
 	const project = {
@@ -46,7 +49,16 @@ describe('ProjectController', () => {
 			deleteProject: jest.fn(),
 		} as unknown as jest.Mocked<IProjectService>
 
-		const projectController = new ProjectController(projectServiceMock)
+		projectResourceAssignmentServiceMock = {
+			getProjectAssignments: jest.fn(),
+			assignResource: jest.fn(),
+			removeResource: jest.fn(),
+		} as unknown as jest.Mocked<IProjectResourceAssignmentService>
+
+		const projectController = new ProjectController(
+			projectServiceMock,
+			projectResourceAssignmentServiceMock
+		)
 
 		app = express()
 		app.use(express.json())
@@ -65,6 +77,16 @@ describe('ProjectController', () => {
 				projectController.updateProject
 			)
 			.delete(projectController.deleteProject)
+		app
+			.route('/projects/:id/assignments')
+			.get(projectController.getProjectAssignments)
+			.post(
+				zodSchemaValidator(assignResourceSchema),
+				projectController.assignResource
+			)
+		app
+			.route('/projects/:id/assignments/:assignmentId')
+			.delete(projectController.removeResource)
 		app.use(globalErrorHandler)
 	})
 
@@ -253,6 +275,132 @@ describe('ProjectController', () => {
 			expect(projectServiceMock.deleteProject).toHaveBeenCalledWith(1)
 			expect(res.body.statusCode).toBe(200)
 			expect(res.body.isSuccess).toBe(true)
+		})
+	})
+
+	describe('GET /projects/:id/assignments', () => {
+		const listItem = {
+			id: 1,
+			user: { id: 2, fullName: 'Jane Smith', email: 'jane@example.com' },
+			resourceRoleType: { id: 3, name: 'Senior Developer' },
+			assignedAt: new Date('2026-06-01T00:00:00.000Z'),
+			isActive: true,
+		}
+
+		it('returns the list of assignments', async () => {
+			projectResourceAssignmentServiceMock.getProjectAssignments.mockResolvedValue(
+				[listItem] as never
+			)
+
+			const res = await request(app).get('/projects/1/assignments')
+
+			expect(
+				projectResourceAssignmentServiceMock.getProjectAssignments
+			).toHaveBeenCalledWith(1, { isActive: undefined })
+			expect(res.body.statusCode).toBe(200)
+			expect(res.body.data).toEqual([serialized(listItem)])
+		})
+
+		it('forwards the isActive query param to the service', async () => {
+			projectResourceAssignmentServiceMock.getProjectAssignments.mockResolvedValue(
+				[] as never
+			)
+
+			await request(app).get('/projects/1/assignments?isActive=false')
+
+			expect(
+				projectResourceAssignmentServiceMock.getProjectAssignments
+			).toHaveBeenCalledWith(1, { isActive: false })
+		})
+
+		it('maps a not-found domain error to 404 via the central error handler', async () => {
+			projectResourceAssignmentServiceMock.getProjectAssignments.mockRejectedValue(
+				new AppException('Project not found', 404)
+			)
+
+			const res = await request(app).get('/projects/999/assignments')
+
+			expect(res.body.statusCode).toBe(404)
+		})
+	})
+
+	describe('POST /projects/:id/assignments', () => {
+		const assignment = {
+			id: 1,
+			projectId: 1,
+			userId: 2,
+			resourceRoleTypeId: 3,
+			assignedAt: new Date('2026-06-15T10:00:00.000Z'),
+			isActive: true,
+		}
+
+		it('returns 422 when userId is missing', async () => {
+			const res = await request(app)
+				.post('/projects/1/assignments')
+				.send({ resourceRoleTypeId: 3 })
+
+			expect(res.body.statusCode).toBe(422)
+			expect(
+				projectResourceAssignmentServiceMock.assignResource
+			).not.toHaveBeenCalled()
+		})
+
+		it('assigns the resource and returns 201 on success', async () => {
+			projectResourceAssignmentServiceMock.assignResource.mockResolvedValue(
+				assignment as never
+			)
+
+			const res = await request(app)
+				.post('/projects/1/assignments')
+				.send({ userId: 2, resourceRoleTypeId: 3 })
+
+			expect(
+				projectResourceAssignmentServiceMock.assignResource
+			).toHaveBeenCalledWith(
+				1,
+				expect.objectContaining({ userId: 2, resourceRoleTypeId: 3 })
+			)
+			expect(res.body.statusCode).toBe(201)
+			expect(res.body.data).toEqual(serialized(assignment))
+		})
+
+		it('propagates a domain AppException (e.g. duplicate assignment) through the central error handler', async () => {
+			projectResourceAssignmentServiceMock.assignResource.mockRejectedValue(
+				new AppException('User is already assigned to this project', 409)
+			)
+
+			const res = await request(app)
+				.post('/projects/1/assignments')
+				.send({ userId: 2, resourceRoleTypeId: 3 })
+
+			expect(res.body.statusCode).toBe(409)
+			expect(res.body.isSuccess).toBe(false)
+		})
+	})
+
+	describe('DELETE /projects/:id/assignments/:assignmentId', () => {
+		it('returns 404 when the assignment does not exist', async () => {
+			projectResourceAssignmentServiceMock.removeResource.mockResolvedValue(
+				false
+			)
+
+			const res = await request(app).delete('/projects/1/assignments/999')
+
+			expect(res.body.statusCode).toBe(404)
+		})
+
+		it('removes the assignment and returns 200 on success', async () => {
+			projectResourceAssignmentServiceMock.removeResource.mockResolvedValue(
+				true
+			)
+
+			const res = await request(app).delete('/projects/1/assignments/1')
+
+			expect(
+				projectResourceAssignmentServiceMock.removeResource
+			).toHaveBeenCalledWith(1, 1)
+			expect(res.body.statusCode).toBe(200)
+			expect(res.body.message).toBe('User removed from project.')
 		})
 	})
 })

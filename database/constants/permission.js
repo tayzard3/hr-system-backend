@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.TIMESHEET_ENTRY_PERMISSION = exports.TIMESHEET_PERIOD_PERMISSION = exports.CURRENCY_PERMISSION = exports.RESOURCE_ROLE_TYPE_PERMISSION = exports.PROJECT_PERMISSION = exports.COUNTRY_PERMISSION = exports.PERMISSION_PERMISSION = exports.ROLE_PERMISSION = exports.USER_PERMISSION = exports.DEVELOPER_PERMISSION = exports.DEFAULT_ROLE = void 0;
+exports.RATE_CARD_PERMISSION = exports.TIMESHEET_ENTRY_PERMISSION = exports.TIMESHEET_PERIOD_PERMISSION = exports.CURRENCY_PERMISSION = exports.RESOURCE_ROLE_TYPE_PERMISSION = exports.PROJECT_PERMISSION = exports.COUNTRY_PERMISSION = exports.PERMISSION_PERMISSION = exports.ROLE_PERMISSION = exports.USER_PERMISSION = exports.DEVELOPER_PERMISSION = exports.DEFAULT_ROLE = void 0;
 exports.DEFAULT_ROLE = Object.freeze({
     DEVELOPER: 'Developer',
 });
@@ -78,5 +78,19 @@ exports.TIMESHEET_ENTRY_PERMISSION = Object.freeze({
     APPROVE: 'TimesheetEntry_Approve',
     UNAPPROVE: 'TimesheetEntry_Unapprove',
     MANAGE_ALL: 'TimesheetEntry_ManageAll',
+});
+/**
+ * `LIST` backs `GetAllRateCards`/`GetRateCardById`/`LookupRateCard` — per
+ * the API spec's RBAC matrix, Rate Cards are read-only for `ProjectAdmin`
+ * and fully writable only for `SystemAdmin` (same "one LIST permission
+ * shared by every read endpoint" convention as `CURRENCY_PERMISSION`).
+ * Which role(s) get which permission is a data/seeding decision — see the
+ * note on `TIMESHEET_ENTRY_PERMISSION` above.
+ */
+exports.RATE_CARD_PERMISSION = Object.freeze({
+    LIST: 'RateCard_List',
+    CREATE: 'RateCard_Create',
+    UPDATE: 'RateCard_Update',
+    DELETE: 'RateCard_Delete',
 });
 //# sourceMappingURL=permission.js.map

@@ -59,6 +59,11 @@ import { TimesheetEntryRepository } from '../repositories/TimesheetEntryReposito
 import { ITimesheetEntryService } from '../interfaces/service/ITimesheetEntryService'
 import { TimesheetEntryService } from '../services/TimesheetEntryService'
 import { TimesheetEntryController } from '../controllers/TimesheetEntryController'
+import { IRateCardRepository } from '../interfaces/repository/IRateCardRepository'
+import { RateCardRepository } from '../repositories/RateCardRepository'
+import { IRateCardService } from '../interfaces/service/IRateCardService'
+import { RateCardService } from '../services/RateCardService'
+import { RateCardController } from '../controllers/RateCardController'
 
 const container = new Container()
 
@@ -96,6 +101,9 @@ container
 container
 	.bind<ITimesheetEntryRepository>(TYPES.ITimesheetEntryRepository)
 	.to(TimesheetEntryRepository)
+container
+	.bind<IRateCardRepository>(TYPES.IRateCardRepository)
+	.to(RateCardRepository)
 
 /** Service */
 container.bind<IUserService>(TYPES.IUserService).to(UserService)
@@ -121,6 +129,7 @@ container
 container
 	.bind<ITimesheetEntryService>(TYPES.ITimesheetEntryService)
 	.to(TimesheetEntryService)
+container.bind<IRateCardService>(TYPES.IRateCardService).to(RateCardService)
 
 // Bind SendGridEmailService or SMTPEmailService to email service
 container.bind<IEmailService>(TYPES.IEmailService).to(SendGridEmailService)
@@ -147,6 +156,9 @@ container
 container
 	.bind<TimesheetEntryController>(TYPES.TimesheetEntryController)
 	.to(TimesheetEntryController)
+container
+	.bind<RateCardController>(TYPES.RateCardController)
+	.to(RateCardController)
 
 // container.bind<boolean>('DEBUG').toConstantValue(true)
 

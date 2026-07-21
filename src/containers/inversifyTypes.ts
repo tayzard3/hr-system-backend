@@ -10,6 +10,7 @@ export const TYPES = {
 	IPermissionRepository: Symbol.for('IPermissionRepository'),
 	IRefreshTokenRepository: Symbol.for('IRefreshTokenRepository'),
 	ICountryRepository: Symbol.for('ICountryRepository'),
+	ICurrencyRepository: Symbol.for('ICurrencyRepository'),
 	IProjectRepository: Symbol.for('IProjectRepository'),
 	IResourceRoleTypeRepository: Symbol.for('IResourceRoleTypeRepository'),
 	IProjectResourceAssignmentRepository: Symbol.for(
@@ -26,6 +27,7 @@ export const TYPES = {
 	IRoleService: Symbol.for('IRoleService'),
 	IPermissionService: Symbol.for('IPermissionService'),
 	ICountryService: Symbol.for('ICountryService'),
+	ICurrencyService: Symbol.for('ICurrencyService'),
 	IProjectService: Symbol.for('IProjectService'),
 	IResourceRoleTypeService: Symbol.for('IResourceRoleTypeService'),
 	IProjectResourceAssignmentService: Symbol.for(
@@ -40,6 +42,7 @@ export const TYPES = {
 	RoleController: Symbol.for('RoleController'),
 	PermissionController: Symbol.for('PermissionController'),
 	CountryController: Symbol.for('CountryController'),
+	CurrencyController: Symbol.for('CurrencyController'),
 	ProjectController: Symbol.for('ProjectController'),
 	ResourceRoleTypeController: Symbol.for('ResourceRoleTypeController'),
 	TimesheetPeriodController: Symbol.for('TimesheetPeriodController'),

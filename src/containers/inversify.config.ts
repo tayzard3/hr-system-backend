@@ -30,6 +30,11 @@ import { CountryRepository } from '../repositories/CountryRepository'
 import { ICountryService } from '../interfaces/service/ICountryService'
 import { CountryService } from '../services/CountryService'
 import { CountryController } from '../controllers/CountryController'
+import { ICurrencyRepository } from '../interfaces/repository/ICurrencyRepository'
+import { CurrencyRepository } from '../repositories/CurrencyRepository'
+import { ICurrencyService } from '../interfaces/service/ICurrencyService'
+import { CurrencyService } from '../services/CurrencyService'
+import { CurrencyController } from '../controllers/CurrencyController'
 import { IProjectRepository } from '../interfaces/repository/IProjectRepository'
 import { ProjectRepository } from '../repositories/ProjectRepository'
 import { IProjectService } from '../interfaces/service/IProjectService'
@@ -72,6 +77,9 @@ container
 	.bind<ICountryRepository>(TYPES.ICountryRepository)
 	.to(CountryRepository)
 container
+	.bind<ICurrencyRepository>(TYPES.ICurrencyRepository)
+	.to(CurrencyRepository)
+container
 	.bind<IProjectRepository>(TYPES.IProjectRepository)
 	.to(ProjectRepository)
 container
@@ -97,6 +105,7 @@ container
 	.bind<IPermissionService>(TYPES.IPermissionService)
 	.to(PermissionService)
 container.bind<ICountryService>(TYPES.ICountryService).to(CountryService)
+container.bind<ICurrencyService>(TYPES.ICurrencyService).to(CurrencyService)
 container.bind<IProjectService>(TYPES.IProjectService).to(ProjectService)
 container
 	.bind<IResourceRoleTypeService>(TYPES.IResourceRoleTypeService)
@@ -125,6 +134,9 @@ container
 	.bind<PermissionController>(TYPES.PermissionController)
 	.to(PermissionController)
 container.bind<CountryController>(TYPES.CountryController).to(CountryController)
+container
+	.bind<CurrencyController>(TYPES.CurrencyController)
+	.to(CurrencyController)
 container.bind<ProjectController>(TYPES.ProjectController).to(ProjectController)
 container
 	.bind<ResourceRoleTypeController>(TYPES.ResourceRoleTypeController)

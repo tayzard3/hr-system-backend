@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.TIMESHEET_ENTRY_PERMISSION = exports.TIMESHEET_PERIOD_PERMISSION = exports.RESOURCE_ROLE_TYPE_PERMISSION = exports.PROJECT_PERMISSION = exports.COUNTRY_PERMISSION = exports.PERMISSION_PERMISSION = exports.ROLE_PERMISSION = exports.USER_PERMISSION = exports.DEVELOPER_PERMISSION = exports.DEFAULT_ROLE = void 0;
+exports.TIMESHEET_ENTRY_PERMISSION = exports.TIMESHEET_PERIOD_PERMISSION = exports.CURRENCY_PERMISSION = exports.RESOURCE_ROLE_TYPE_PERMISSION = exports.PROJECT_PERMISSION = exports.COUNTRY_PERMISSION = exports.PERMISSION_PERMISSION = exports.ROLE_PERMISSION = exports.USER_PERMISSION = exports.DEVELOPER_PERMISSION = exports.DEFAULT_ROLE = void 0;
 exports.DEFAULT_ROLE = Object.freeze({
     DEVELOPER: 'Developer',
 });
@@ -44,6 +44,12 @@ exports.RESOURCE_ROLE_TYPE_PERMISSION = Object.freeze({
     CREATE: 'ResourceRoleType_Create',
     UPDATE: 'ResourceRoleType_Update',
     DELETE: 'ResourceRoleType_Delete',
+});
+exports.CURRENCY_PERMISSION = Object.freeze({
+    LIST: 'Currency_List',
+    CREATE: 'Currency_Create',
+    UPDATE: 'Currency_Update',
+    DELETE: 'Currency_Delete',
 });
 exports.TIMESHEET_PERIOD_PERMISSION = Object.freeze({
     LIST: 'TimesheetPeriod_List',

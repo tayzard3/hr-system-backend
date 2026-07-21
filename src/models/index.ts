@@ -10,6 +10,7 @@ import { RoleModel, initRole } from './Role'
 import { PermissionModel, initPermission } from './Permission'
 import { RefreshTokenModel, initRefreshToken } from './RefreshToken'
 import { CountryModel, initCountry } from './Country'
+import { CurrencyModel, initCurrency } from './Currency'
 import { ProjectModel, initProject } from './Project'
 import { ResourceRoleTypeModel, initResourceRoleType } from './ResourceRoleType'
 import {
@@ -67,6 +68,7 @@ db.Role = initRole(sequelize)
 db.Permission = initPermission(sequelize)
 db.RefreshToken = initRefreshToken(sequelize)
 db.Country = initCountry(sequelize)
+db.Currency = initCurrency(sequelize)
 db.Project = initProject(sequelize)
 db.ResourceRoleType = initResourceRoleType(sequelize)
 db.ProjectResourceAssignment = initProjectResourceAssignment(sequelize)
@@ -84,6 +86,7 @@ export const Role = db.Role as RoleModel
 export const Permission = db.Permission as PermissionModel
 export const RefreshToken = db.RefreshToken as RefreshTokenModel
 export const Country = db.Country as CountryModel
+export const Currency = db.Currency as CurrencyModel
 export const Project = db.Project as ProjectModel
 export const ResourceRoleType = db.ResourceRoleType as ResourceRoleTypeModel
 export const ProjectResourceAssignment =

@@ -50,6 +50,13 @@ export const RESOURCE_ROLE_TYPE_PERMISSION = Object.freeze({
 	DELETE: 'ResourceRoleType_Delete',
 })
 
+export const CURRENCY_PERMISSION = Object.freeze({
+	LIST: 'Currency_List',
+	CREATE: 'Currency_Create',
+	UPDATE: 'Currency_Update',
+	DELETE: 'Currency_Delete',
+})
+
 export const TIMESHEET_PERIOD_PERMISSION = Object.freeze({
 	LIST: 'TimesheetPeriod_List',
 	CREATE: 'TimesheetPeriod_Create',

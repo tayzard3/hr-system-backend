@@ -86,3 +86,18 @@ export const TIMESHEET_ENTRY_PERMISSION = Object.freeze({
 	UNAPPROVE: 'TimesheetEntry_Unapprove',
 	MANAGE_ALL: 'TimesheetEntry_ManageAll',
 })
+
+/**
+ * `LIST` backs `GetAllRateCards`/`GetRateCardById`/`LookupRateCard` — per
+ * the API spec's RBAC matrix, Rate Cards are read-only for `ProjectAdmin`
+ * and fully writable only for `SystemAdmin` (same "one LIST permission
+ * shared by every read endpoint" convention as `CURRENCY_PERMISSION`).
+ * Which role(s) get which permission is a data/seeding decision — see the
+ * note on `TIMESHEET_ENTRY_PERMISSION` above.
+ */
+export const RATE_CARD_PERMISSION = Object.freeze({
+	LIST: 'RateCard_List',
+	CREATE: 'RateCard_Create',
+	UPDATE: 'RateCard_Update',
+	DELETE: 'RateCard_Delete',
+})

@@ -18,6 +18,7 @@ export const TYPES = {
 	),
 	ITimesheetPeriodRepository: Symbol.for('ITimesheetPeriodRepository'),
 	ITimesheetEntryRepository: Symbol.for('ITimesheetEntryRepository'),
+	IRateCardRepository: Symbol.for('IRateCardRepository'),
 
 	/** Service */
 	IUserService: Symbol.for('IUserService'),
@@ -35,6 +36,7 @@ export const TYPES = {
 	),
 	ITimesheetPeriodService: Symbol.for('ITimesheetPeriodService'),
 	ITimesheetEntryService: Symbol.for('ITimesheetEntryService'),
+	IRateCardService: Symbol.for('IRateCardService'),
 
 	/** Controller */
 	UserController: Symbol.for('UserController'),
@@ -47,4 +49,5 @@ export const TYPES = {
 	ResourceRoleTypeController: Symbol.for('ResourceRoleTypeController'),
 	TimesheetPeriodController: Symbol.for('TimesheetPeriodController'),
 	TimesheetEntryController: Symbol.for('TimesheetEntryController'),
+	RateCardController: Symbol.for('RateCardController'),
 }

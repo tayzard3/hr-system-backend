@@ -1,0 +1,65 @@
+'use strict'
+
+const { TIMESHEET_ENTRY_PERMISSION } = require('../constants')
+
+/** @type {import('sequelize-cli').Migration} */
+module.exports = {
+	async up(queryInterface, Sequelize) {
+		const newTimesheetEntryPermissions = [
+			TIMESHEET_ENTRY_PERMISSION.LIST,
+			TIMESHEET_ENTRY_PERMISSION.CREATE,
+			TIMESHEET_ENTRY_PERMISSION.UPDATE,
+			TIMESHEET_ENTRY_PERMISSION.DELETE,
+			TIMESHEET_ENTRY_PERMISSION.APPROVE,
+			TIMESHEET_ENTRY_PERMISSION.UNAPPROVE,
+			TIMESHEET_ENTRY_PERMISSION.MANAGE_ALL,
+		]
+
+		// Check which permissions already exist in the database
+		const existingPermissions = await queryInterface.sequelize.query(
+			'SELECT name FROM permissions WHERE name IN (:permissions)',
+			{
+				type: queryInterface.sequelize.QueryTypes.SELECT,
+				replacements: { permissions: newTimesheetEntryPermissions },
+			}
+		)
+
+		// Extract just the permission names from the result
+		const existingPermissionNames = existingPermissions.map(
+			(perm) => perm.name
+		)
+
+		// Filter out permissions that already exist
+		const newPermissions = newTimesheetEntryPermissions.filter(
+			(permission) => !existingPermissionNames.includes(permission)
+		)
+
+		// Only insert if there are new permissions to add
+		if (newPermissions.length > 0) {
+			const permissionObj = newPermissions.map((permissionName) => {
+				return {
+					name: permissionName,
+					created_at: new Date(),
+					updated_at: new Date(),
+				}
+			})
+			await queryInterface.bulkInsert('permissions', permissionObj, {})
+		}
+	},
+
+	async down(queryInterface, Sequelize) {
+		const newTimesheetEntryPermissions = [
+			TIMESHEET_ENTRY_PERMISSION.LIST,
+			TIMESHEET_ENTRY_PERMISSION.CREATE,
+			TIMESHEET_ENTRY_PERMISSION.UPDATE,
+			TIMESHEET_ENTRY_PERMISSION.DELETE,
+			TIMESHEET_ENTRY_PERMISSION.APPROVE,
+			TIMESHEET_ENTRY_PERMISSION.UNAPPROVE,
+			TIMESHEET_ENTRY_PERMISSION.MANAGE_ALL,
+		]
+
+		await queryInterface.bulkDelete('permissions', {
+			name: newTimesheetEntryPermissions,
+		})
+	},
+}

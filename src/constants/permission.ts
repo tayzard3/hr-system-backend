@@ -57,3 +57,25 @@ export const TIMESHEET_PERIOD_PERMISSION = Object.freeze({
 	UNLOCK: 'TimesheetPeriod_Unlock',
 	DELETE: 'TimesheetPeriod_Delete',
 })
+
+/**
+ * `MANAGE_ALL` backs the "admins see/manage everyone's entries, regular
+ * users are scoped to their own" split the API spec calls out for
+ * `GetAllTimesheetEntries`/`GetTimesheetEntryById`/`DeleteTimesheetEntry`
+ * (TS-03, TS-06). It is checked via `req.ability.can('ManageAll',
+ * 'TimesheetEntry')` in the controller (same "compute a boolean off
+ * `req` in the controller, pass it into the service" pattern as
+ * `RoleController.getAllRoles`'s `isDeveloper` flag) rather than
+ * hard-coding role names — this codebase has no seeded `SystemAdmin`/
+ * `ProjectAdmin` roles yet (only `Developer`), so which role(s) get this
+ * permission is a data/seeding decision, not a code one.
+ */
+export const TIMESHEET_ENTRY_PERMISSION = Object.freeze({
+	LIST: 'TimesheetEntry_List',
+	CREATE: 'TimesheetEntry_Create',
+	UPDATE: 'TimesheetEntry_Update',
+	DELETE: 'TimesheetEntry_Delete',
+	APPROVE: 'TimesheetEntry_Approve',
+	UNAPPROVE: 'TimesheetEntry_Unapprove',
+	MANAGE_ALL: 'TimesheetEntry_ManageAll',
+})

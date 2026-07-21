@@ -49,6 +49,11 @@ import { TimesheetPeriodRepository } from '../repositories/TimesheetPeriodReposi
 import { ITimesheetPeriodService } from '../interfaces/service/ITimesheetPeriodService'
 import { TimesheetPeriodService } from '../services/TimesheetPeriodService'
 import { TimesheetPeriodController } from '../controllers/TimesheetPeriodController'
+import { ITimesheetEntryRepository } from '../interfaces/repository/ITimesheetEntryRepository'
+import { TimesheetEntryRepository } from '../repositories/TimesheetEntryRepository'
+import { ITimesheetEntryService } from '../interfaces/service/ITimesheetEntryService'
+import { TimesheetEntryService } from '../services/TimesheetEntryService'
+import { TimesheetEntryController } from '../controllers/TimesheetEntryController'
 
 const container = new Container()
 
@@ -80,6 +85,9 @@ container
 container
 	.bind<ITimesheetPeriodRepository>(TYPES.ITimesheetPeriodRepository)
 	.to(TimesheetPeriodRepository)
+container
+	.bind<ITimesheetEntryRepository>(TYPES.ITimesheetEntryRepository)
+	.to(TimesheetEntryRepository)
 
 /** Service */
 container.bind<IUserService>(TYPES.IUserService).to(UserService)
@@ -101,6 +109,9 @@ container
 container
 	.bind<ITimesheetPeriodService>(TYPES.ITimesheetPeriodService)
 	.to(TimesheetPeriodService)
+container
+	.bind<ITimesheetEntryService>(TYPES.ITimesheetEntryService)
+	.to(TimesheetEntryService)
 
 // Bind SendGridEmailService or SMTPEmailService to email service
 container.bind<IEmailService>(TYPES.IEmailService).to(SendGridEmailService)
@@ -121,6 +132,9 @@ container
 container
 	.bind<TimesheetPeriodController>(TYPES.TimesheetPeriodController)
 	.to(TimesheetPeriodController)
+container
+	.bind<TimesheetEntryController>(TYPES.TimesheetEntryController)
+	.to(TimesheetEntryController)
 
 // container.bind<boolean>('DEBUG').toConstantValue(true)
 

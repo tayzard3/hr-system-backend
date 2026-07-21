@@ -7,6 +7,7 @@ import countryRoutes from './countryRoutes'
 import projectRoutes from './projectRoutes'
 import resourceRoleTypeRoutes from './resourceRoleTypeRoutes'
 import timesheetPeriodRoutes from './timesheetPeriodRoutes'
+import timesheetEntryRoutes from './timesheetEntryRoutes'
 import { protect } from '../../middlewares/authMiddleware'
 
 const router = Router()
@@ -19,5 +20,6 @@ router.use('/countries', protect, countryRoutes)
 router.use('/projects', protect, projectRoutes)
 router.use('/resource-role-types', protect, resourceRoleTypeRoutes)
 router.use('/timesheet-periods', protect, timesheetPeriodRoutes)
+router.use('/timesheet-entries', protect, timesheetEntryRoutes)
 
 export default router

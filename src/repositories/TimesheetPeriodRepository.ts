@@ -26,4 +26,13 @@ export class TimesheetPeriodRepository
 			},
 		})
 	}
+
+	public async findByDate(date: string): Promise<TimesheetPeriod | null> {
+		return this.model.findOne({
+			where: {
+				startDate: { [Op.lte]: date },
+				endDate: { [Op.gte]: date },
+			},
+		})
+	}
 }

@@ -19,6 +19,7 @@ export const TYPES = {
 	ITimesheetPeriodRepository: Symbol.for('ITimesheetPeriodRepository'),
 	ITimesheetEntryRepository: Symbol.for('ITimesheetEntryRepository'),
 	IRateCardRepository: Symbol.for('IRateCardRepository'),
+	IExchangeRateRepository: Symbol.for('IExchangeRateRepository'),
 
 	/** Service */
 	IUserService: Symbol.for('IUserService'),
@@ -37,6 +38,7 @@ export const TYPES = {
 	ITimesheetPeriodService: Symbol.for('ITimesheetPeriodService'),
 	ITimesheetEntryService: Symbol.for('ITimesheetEntryService'),
 	IRateCardService: Symbol.for('IRateCardService'),
+	IExchangeRateService: Symbol.for('IExchangeRateService'),
 
 	/** Controller */
 	UserController: Symbol.for('UserController'),
@@ -50,4 +52,5 @@ export const TYPES = {
 	TimesheetPeriodController: Symbol.for('TimesheetPeriodController'),
 	TimesheetEntryController: Symbol.for('TimesheetEntryController'),
 	RateCardController: Symbol.for('RateCardController'),
+	ExchangeRateController: Symbol.for('ExchangeRateController'),
 }

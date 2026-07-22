@@ -101,3 +101,23 @@ export const RATE_CARD_PERMISSION = Object.freeze({
 	UPDATE: 'RateCard_Update',
 	DELETE: 'RateCard_Delete',
 })
+
+/**
+ * `LIST` backs `GetAllExchangeRates`/`GetExchangeRateById` — per the API
+ * spec's RBAC matrix, Exchange Rates are read-only for `ProjectAdmin` and
+ * fully writable only for `SystemAdmin` (same "one LIST permission shared by
+ * every read endpoint" convention as `RATE_CARD_PERMISSION`). Which role(s)
+ * get which permission is a data/seeding decision — see the note on
+ * `TIMESHEET_ENTRY_PERMISSION` above.
+ *
+ * `GetLatestExchangeRate` is intentionally NOT gated by any of these: the API
+ * spec documents its `Auth` as "Any authenticated user" (unlike
+ * `LookupRateCard`, which the spec restricts to `ProjectAdmin`/`SystemAdmin`)
+ * — see `exchangeRateRoutes.ts`.
+ */
+export const EXCHANGE_RATE_PERMISSION = Object.freeze({
+	LIST: 'ExchangeRate_List',
+	CREATE: 'ExchangeRate_Create',
+	UPDATE: 'ExchangeRate_Update',
+	DELETE: 'ExchangeRate_Delete',
+})

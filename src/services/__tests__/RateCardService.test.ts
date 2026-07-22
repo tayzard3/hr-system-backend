@@ -1,4 +1,4 @@
-import { Transaction } from 'sequelize'
+import { Transaction, UniqueConstraintError } from 'sequelize'
 import { IRateCardRepository } from '../../interfaces/repository/IRateCardRepository'
 import { ICountryRepository } from '../../interfaces/repository/ICountryRepository'
 import { IResourceRoleTypeRepository } from '../../interfaces/repository/IResourceRoleTypeRepository'
@@ -237,6 +237,28 @@ describe('RateCardService', () => {
 				rateCardService.createRateCard(createDTO)
 			).rejects.toMatchObject({ statusCode: 500 })
 		})
+
+		it('maps a raw DB unique-constraint violation to a clean 409 (race past the pre-check)', async () => {
+			countryRepository.findByPk.mockResolvedValue(singapore as never)
+			resourceRoleTypeRepository.findByPk.mockResolvedValue(
+				seniorDeveloper as never
+			)
+			currencyRepository.findByPk.mockResolvedValue(sgd as never)
+			rateCardRepository.findActiveByCountryRoleAndEffectiveDate.mockResolvedValue(
+				null
+			)
+			rateCardRepository.create.mockRejectedValue(
+				new UniqueConstraintError({})
+			)
+
+			await expect(
+				rateCardService.createRateCard(createDTO)
+			).rejects.toMatchObject({
+				statusCode: 409,
+				message:
+					'An active rate card already exists for this country, resource role type, and effective date',
+			})
+		})
 	})
 
 	describe('getRateCardById', () => {
@@ -355,6 +377,24 @@ describe('RateCardService', () => {
 				expect.objectContaining({ transaction: expect.anything() })
 			)
 			expect(result?.hourlyRate).toBe(150)
+		})
+
+		it('maps a raw DB unique-constraint violation to a clean 409 (race past the pre-check)', async () => {
+			const instance = rateCardRow({
+				update: jest.fn().mockRejectedValue(new UniqueConstraintError({})),
+			})
+			rateCardRepository.findByPk.mockResolvedValue(instance as never)
+			rateCardRepository.findActiveByCountryRoleAndEffectiveDate.mockResolvedValue(
+				null
+			)
+
+			await expect(
+				rateCardService.updateRateCard(10, { hourlyRate: 150 })
+			).rejects.toMatchObject({
+				statusCode: 409,
+				message:
+					'An active rate card already exists for this country, resource role type, and effective date',
+			})
 		})
 
 		it('does not re-check for conflicts when neither effectiveDate nor isActive change', async () => {

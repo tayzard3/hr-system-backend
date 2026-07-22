@@ -1,5 +1,5 @@
 import { injectable, inject } from 'inversify'
-import { WhereOptions, Op } from 'sequelize'
+import { WhereOptions, Op, UniqueConstraintError } from 'sequelize'
 import { IRateCardService } from '../interfaces/service/IRateCardService'
 import { IRateCardRepository } from '../interfaces/repository/IRateCardRepository'
 import { ICountryRepository } from '../interfaces/repository/ICountryRepository'
@@ -33,6 +33,9 @@ const RATE_CARD_INCLUDE = [
 
 @injectable()
 export class RateCardService implements IRateCardService {
+	private static readonly ACTIVE_CONFLICT_MESSAGE =
+		'An active rate card already exists for this country, resource role type, and effective date'
+
 	constructor(
 		@inject(TYPES.IRateCardRepository)
 		private rateCardRepository: IRateCardRepository,
@@ -108,11 +111,25 @@ export class RateCardService implements IRateCardService {
 			)
 
 		if (conflict) {
-			throw new AppException(
-				'An active rate card already exists for this country, resource role type, and effective date',
-				409
-			)
+			throw new AppException(RateCardService.ACTIVE_CONFLICT_MESSAGE, 409)
 		}
+	}
+
+	/**
+	 * Maps the DB-level `rate_cards_active_country_role_effective_uidx`
+	 * unique-constraint violation (the authoritative backstop for
+	 * `assertNoConflictingActiveRateCard` above) to the same clean 409
+	 * `AppException`. Closes the check-then-act race window between the
+	 * application-level pre-check and the write: two concurrent requests can
+	 * both pass the pre-check, but only one `create`/`update` will succeed —
+	 * the loser now gets a well-formed 409 instead of an unhandled 500 from a
+	 * raw Sequelize `UniqueConstraintError`.
+	 */
+	private rethrowAsConflictIfUniqueConstraint(error: unknown): never {
+		if (error instanceof UniqueConstraintError) {
+			throw new AppException(RateCardService.ACTIVE_CONFLICT_MESSAGE, 409)
+		}
+		throw error
 	}
 
 	public async getAllRateCards(
@@ -210,18 +227,22 @@ export class RateCardService implements IRateCardService {
 		const costRate = data.costRate ?? data.hourlyRate
 
 		const rateCard = await sequelize.transaction(async (transaction) => {
-			return this.rateCardRepository.create(
-				{
-					countryId,
-					resourceRoleTypeId,
-					currencyId,
-					billingRate: data.hourlyRate.toFixed(2),
-					costRate: costRate.toFixed(2),
-					effectiveDate,
-					isActive,
-				},
-				{ transaction }
-			)
+			try {
+				return await this.rateCardRepository.create(
+					{
+						countryId,
+						resourceRoleTypeId,
+						currencyId,
+						billingRate: data.hourlyRate.toFixed(2),
+						costRate: costRate.toFixed(2),
+						effectiveDate,
+						isActive,
+					},
+					{ transaction }
+				)
+			} catch (error) {
+				this.rethrowAsConflictIfUniqueConstraint(error)
+			}
 		})
 
 		if (!rateCard) {
@@ -287,24 +308,28 @@ export class RateCardService implements IRateCardService {
 		// `RETURNING`. Updating the already-fetched instance directly avoids
 		// relying on it — see the identical note in `CurrencyService.updateCurrency`.
 		const updated = await sequelize.transaction(async (transaction) => {
-			return rateCard.update(
-				{
-					...(data.hourlyRate !== undefined && {
-						billingRate: data.hourlyRate.toFixed(2),
-					}),
-					...(data.costRate !== undefined && {
-						costRate: data.costRate.toFixed(2),
-					}),
-					...(data.effectiveDate !== undefined && {
-						effectiveDate: data.effectiveDate,
-					}),
-					...(data.isActive !== undefined && { isActive: data.isActive }),
-					...(data.currencyId !== undefined && {
-						currencyId: data.currencyId,
-					}),
-				},
-				{ transaction }
-			)
+			try {
+				return await rateCard.update(
+					{
+						...(data.hourlyRate !== undefined && {
+							billingRate: data.hourlyRate.toFixed(2),
+						}),
+						...(data.costRate !== undefined && {
+							costRate: data.costRate.toFixed(2),
+						}),
+						...(data.effectiveDate !== undefined && {
+							effectiveDate: data.effectiveDate,
+						}),
+						...(data.isActive !== undefined && { isActive: data.isActive }),
+						...(data.currencyId !== undefined && {
+							currencyId: data.currencyId,
+						}),
+					},
+					{ transaction }
+				)
+			} catch (error) {
+				this.rethrowAsConflictIfUniqueConstraint(error)
+			}
 		})
 
 		return this.buildResponseDTO(updated, country, resourceRoleType, currency)

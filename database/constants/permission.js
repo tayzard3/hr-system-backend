@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.RATE_CARD_PERMISSION = exports.TIMESHEET_ENTRY_PERMISSION = exports.TIMESHEET_PERIOD_PERMISSION = exports.CURRENCY_PERMISSION = exports.RESOURCE_ROLE_TYPE_PERMISSION = exports.PROJECT_PERMISSION = exports.COUNTRY_PERMISSION = exports.PERMISSION_PERMISSION = exports.ROLE_PERMISSION = exports.USER_PERMISSION = exports.DEVELOPER_PERMISSION = exports.DEFAULT_ROLE = void 0;
+exports.EXCHANGE_RATE_PERMISSION = exports.RATE_CARD_PERMISSION = exports.TIMESHEET_ENTRY_PERMISSION = exports.TIMESHEET_PERIOD_PERMISSION = exports.CURRENCY_PERMISSION = exports.RESOURCE_ROLE_TYPE_PERMISSION = exports.PROJECT_PERMISSION = exports.COUNTRY_PERMISSION = exports.PERMISSION_PERMISSION = exports.ROLE_PERMISSION = exports.USER_PERMISSION = exports.DEVELOPER_PERMISSION = exports.DEFAULT_ROLE = void 0;
 exports.DEFAULT_ROLE = Object.freeze({
     DEVELOPER: 'Developer',
 });
@@ -92,5 +92,24 @@ exports.RATE_CARD_PERMISSION = Object.freeze({
     CREATE: 'RateCard_Create',
     UPDATE: 'RateCard_Update',
     DELETE: 'RateCard_Delete',
+});
+/**
+ * `LIST` backs `GetAllExchangeRates`/`GetExchangeRateById` — per the API
+ * spec's RBAC matrix, Exchange Rates are read-only for `ProjectAdmin` and
+ * fully writable only for `SystemAdmin` (same "one LIST permission shared by
+ * every read endpoint" convention as `RATE_CARD_PERMISSION`). Which role(s)
+ * get which permission is a data/seeding decision — see the note on
+ * `TIMESHEET_ENTRY_PERMISSION` above.
+ *
+ * `GetLatestExchangeRate` is intentionally NOT gated by any of these: the API
+ * spec documents its `Auth` as "Any authenticated user" (unlike
+ * `LookupRateCard`, which the spec restricts to `ProjectAdmin`/`SystemAdmin`)
+ * — see `exchangeRateRoutes.ts`.
+ */
+exports.EXCHANGE_RATE_PERMISSION = Object.freeze({
+    LIST: 'ExchangeRate_List',
+    CREATE: 'ExchangeRate_Create',
+    UPDATE: 'ExchangeRate_Update',
+    DELETE: 'ExchangeRate_Delete',
 });
 //# sourceMappingURL=permission.js.map

@@ -21,6 +21,8 @@ import { TimesheetPeriodModel, initTimesheetPeriod } from './TimesheetPeriod'
 import { TimesheetEntryModel, initTimesheetEntry } from './TimesheetEntry'
 import { RateCardModel, initRateCard } from './RateCard'
 import { ExchangeRateModel, initExchangeRate } from './ExchangeRate'
+import { InvoiceModel, initInvoice } from './Invoice'
+import { InvoiceLineItemModel, initInvoiceLineItem } from './InvoiceLineItem'
 
 const env = process.env.NODE_ENV || 'development'
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -78,6 +80,8 @@ db.TimesheetPeriod = initTimesheetPeriod(sequelize)
 db.TimesheetEntry = initTimesheetEntry(sequelize)
 db.RateCard = initRateCard(sequelize)
 db.ExchangeRate = initExchangeRate(sequelize)
+db.Invoice = initInvoice(sequelize)
+db.InvoiceLineItem = initInvoiceLineItem(sequelize)
 
 Object.keys(db).forEach((modelName) => {
 	if (db[modelName].associate) {
@@ -99,5 +103,7 @@ export const TimesheetPeriod = db.TimesheetPeriod as TimesheetPeriodModel
 export const TimesheetEntry = db.TimesheetEntry as TimesheetEntryModel
 export const RateCard = db.RateCard as RateCardModel
 export const ExchangeRate = db.ExchangeRate as ExchangeRateModel
+export const Invoice = db.Invoice as InvoiceModel
+export const InvoiceLineItem = db.InvoiceLineItem as InvoiceLineItemModel
 
 export default db

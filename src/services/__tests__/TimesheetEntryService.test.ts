@@ -628,6 +628,33 @@ describe('TimesheetEntryService', () => {
 				expect.objectContaining({ transaction: expect.anything() })
 			)
 		})
+
+		// Regression check for the Invoice feature (see the
+		// `add-invoiced-at-to-timesheet-entries` migration and
+		// `TimesheetEntry.invoicedAt`'s doc-comment): the API spec documents
+		// `UnapproveTimesheetEntry` as "(only if not yet invoiced)" with a
+		// `409 entry already included in an invoice` error response. This
+		// was originally missing (see the QA report for this feature) —
+		// `unapproveTimesheetEntry` did not check `invoicedAt`, so an
+		// already-invoiced entry could be unapproved, leaving an active
+		// invoice line item pointing at an entry that is no longer approved.
+		// The guard has since been added; this test now passes and guards
+		// against regressing it.
+		it('throws 409 when the entry has already been invoiced', async () => {
+			const instance = {
+				...baseEntry,
+				isApproved: true,
+				invoicedAt: new Date('2026-07-20T00:00:00.000Z'),
+				update: jest.fn().mockResolvedValue(undefined),
+			}
+			timesheetEntryRepository.findByPk.mockResolvedValue(instance as never)
+
+			await expect(
+				timesheetEntryService.unapproveTimesheetEntry(10)
+			).rejects.toMatchObject({ statusCode: 409 })
+
+			expect(instance.update).not.toHaveBeenCalled()
+		})
 	})
 
 	describe('bulkApproveTimesheetEntries', () => {

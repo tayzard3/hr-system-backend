@@ -476,11 +476,10 @@ export class TimesheetEntryService implements ITimesheetEntryService {
 		if (!entry.isApproved) {
 			throw new AppException('Timesheet entry is not approved', 409)
 		}
+		if (entry.invoicedAt) {
+			throw new AppException('Entry has already been included in an invoice', 409)
+		}
 
-		// Note: `InvoiceLineItem`/`Invoice` (Module 6) do not exist yet in
-		// this codebase, so the API spec's `409 entry already included in an
-		// invoice` guard can't be checked here — add it once that
-		// association exists.
 		await sequelize.transaction(async (transaction) => {
 			await entry.update(
 				{ isApproved: false, approvedBy: null, approvedAt: null },

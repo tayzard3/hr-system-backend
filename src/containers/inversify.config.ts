@@ -69,6 +69,13 @@ import { ExchangeRateRepository } from '../repositories/ExchangeRateRepository'
 import { IExchangeRateService } from '../interfaces/service/IExchangeRateService'
 import { ExchangeRateService } from '../services/ExchangeRateService'
 import { ExchangeRateController } from '../controllers/ExchangeRateController'
+import { IInvoiceRepository } from '../interfaces/repository/IInvoiceRepository'
+import { InvoiceRepository } from '../repositories/InvoiceRepository'
+import { IInvoiceLineItemRepository } from '../interfaces/repository/IInvoiceLineItemRepository'
+import { InvoiceLineItemRepository } from '../repositories/InvoiceLineItemRepository'
+import { IInvoiceService } from '../interfaces/service/IInvoiceService'
+import { InvoiceService } from '../services/InvoiceService'
+import { InvoiceController } from '../controllers/InvoiceController'
 
 const container = new Container()
 
@@ -112,6 +119,12 @@ container
 container
 	.bind<IExchangeRateRepository>(TYPES.IExchangeRateRepository)
 	.to(ExchangeRateRepository)
+container
+	.bind<IInvoiceRepository>(TYPES.IInvoiceRepository)
+	.to(InvoiceRepository)
+container
+	.bind<IInvoiceLineItemRepository>(TYPES.IInvoiceLineItemRepository)
+	.to(InvoiceLineItemRepository)
 
 /** Service */
 container.bind<IUserService>(TYPES.IUserService).to(UserService)
@@ -141,6 +154,7 @@ container.bind<IRateCardService>(TYPES.IRateCardService).to(RateCardService)
 container
 	.bind<IExchangeRateService>(TYPES.IExchangeRateService)
 	.to(ExchangeRateService)
+container.bind<IInvoiceService>(TYPES.IInvoiceService).to(InvoiceService)
 
 // Bind SendGridEmailService or SMTPEmailService to email service
 container.bind<IEmailService>(TYPES.IEmailService).to(SendGridEmailService)
@@ -173,6 +187,7 @@ container
 container
 	.bind<ExchangeRateController>(TYPES.ExchangeRateController)
 	.to(ExchangeRateController)
+container.bind<InvoiceController>(TYPES.InvoiceController).to(InvoiceController)
 
 // container.bind<boolean>('DEBUG').toConstantValue(true)
 

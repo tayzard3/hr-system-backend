@@ -69,6 +69,13 @@ import { ExchangeRateRepository } from '../repositories/ExchangeRateRepository'
 import { IExchangeRateService } from '../interfaces/service/IExchangeRateService'
 import { ExchangeRateService } from '../services/ExchangeRateService'
 import { ExchangeRateController } from '../controllers/ExchangeRateController'
+import { IInvoiceRepository } from '../interfaces/repository/IInvoiceRepository'
+import { InvoiceRepository } from '../repositories/InvoiceRepository'
+import { IInvoiceLineItemRepository } from '../interfaces/repository/IInvoiceLineItemRepository'
+import { InvoiceLineItemRepository } from '../repositories/InvoiceLineItemRepository'
+import { IInvoiceService } from '../interfaces/service/IInvoiceService'
+import { InvoiceService } from '../services/InvoiceService'
+import { InvoiceController } from '../controllers/InvoiceController'
 import { IReportRepository } from '../interfaces/repository/IReportRepository'
 import { ReportRepository } from '../repositories/ReportRepository'
 import { IReportService } from '../interfaces/service/IReportService'
@@ -117,6 +124,12 @@ container
 container
 	.bind<IExchangeRateRepository>(TYPES.IExchangeRateRepository)
 	.to(ExchangeRateRepository)
+container
+	.bind<IInvoiceRepository>(TYPES.IInvoiceRepository)
+	.to(InvoiceRepository)
+container
+	.bind<IInvoiceLineItemRepository>(TYPES.IInvoiceLineItemRepository)
+	.to(InvoiceLineItemRepository)
 container.bind<IReportRepository>(TYPES.IReportRepository).to(ReportRepository)
 
 /** Service */
@@ -147,6 +160,7 @@ container.bind<IRateCardService>(TYPES.IRateCardService).to(RateCardService)
 container
 	.bind<IExchangeRateService>(TYPES.IExchangeRateService)
 	.to(ExchangeRateService)
+container.bind<IInvoiceService>(TYPES.IInvoiceService).to(InvoiceService)
 container.bind<IReportService>(TYPES.IReportService).to(ReportService)
 
 // Bind SendGridEmailService or SMTPEmailService to email service
@@ -180,6 +194,7 @@ container
 container
 	.bind<ExchangeRateController>(TYPES.ExchangeRateController)
 	.to(ExchangeRateController)
+container.bind<InvoiceController>(TYPES.InvoiceController).to(InvoiceController)
 container.bind<ReportController>(TYPES.ReportController).to(ReportController)
 
 // container.bind<boolean>('DEBUG').toConstantValue(true)

@@ -30,6 +30,13 @@ export class TimesheetEntry extends Model<
 	declare isApproved: CreationOptional<boolean>
 	declare approvedBy: CreationOptional<number | null>
 	declare approvedAt: CreationOptional<Date | null>
+	// Denormalised marker set when this entry is pulled into an invoice line
+	// item (see the Invoice feature's migrations). NULL = not yet invoiced.
+	// The authoritative source of truth is the unique index on
+	// invoice_line_items.timesheet_entry_id; this column exists purely for
+	// cheap single-row "already invoiced?" checks (e.g.
+	// UnapproveTimesheetEntry, GenerateInvoice's entry-selection query).
+	declare invoicedAt: CreationOptional<Date | null>
 	declare createdAt: CreationOptional<Date>
 	declare updatedAt: CreationOptional<Date>
 	declare deletedAt: CreationOptional<Date | null>
@@ -123,6 +130,11 @@ export function initTimesheetEntry(sequelize: Sequelize): typeof TimesheetEntry 
 				type: DataTypes.DATE,
 				allowNull: true,
 				field: 'approved_at',
+			},
+			invoicedAt: {
+				type: DataTypes.DATE,
+				allowNull: true,
+				field: 'invoiced_at',
 			},
 			createdAt: {
 				allowNull: false,

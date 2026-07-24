@@ -123,6 +123,23 @@ export const EXCHANGE_RATE_PERMISSION = Object.freeze({
 })
 
 /**
+ * One permission per action (rather than a single shared `MANAGE`), matching
+ * the API spec's RBAC matrix distinguishing "Invoice GenerateInvoice + Manage"
+ * (ProjectAdmin + SystemAdmin) from `DeleteInvoice`/`VoidInvoice` (the spec's
+ * per-endpoint `Auth` column restricts those two to `SystemAdmin` only). Which
+ * role(s) get which permission is a data/seeding decision — see the note on
+ * `TIMESHEET_ENTRY_PERMISSION` above.
+ */
+export const INVOICE_PERMISSION = Object.freeze({
+	LIST: 'Invoice_List',
+	GENERATE: 'Invoice_Generate',
+	UPDATE: 'Invoice_Update',
+	DELETE: 'Invoice_Delete',
+	SEND: 'Invoice_Send',
+	MARK_PAID: 'Invoice_MarkPaid',
+	VOID: 'Invoice_Void',
+	CANCEL: 'Invoice_Cancel',
+	DOWNLOAD_PDF: 'Invoice_DownloadPdf',
  * Per the API spec's RBAC matrix, all of Module 5 (`GenerateTimesheetReport`,
  * `GenerateUserRolesSummary`, `GenerateMonthlyCostRevenue` and their `Export*`
  * counterparts) is `ProjectAdmin`/`SystemAdmin`-only with no partial/"own

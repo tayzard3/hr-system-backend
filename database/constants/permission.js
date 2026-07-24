@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.INVOICE_PERMISSION = exports.EXCHANGE_RATE_PERMISSION = exports.RATE_CARD_PERMISSION = exports.TIMESHEET_ENTRY_PERMISSION = exports.TIMESHEET_PERIOD_PERMISSION = exports.CURRENCY_PERMISSION = exports.RESOURCE_ROLE_TYPE_PERMISSION = exports.PROJECT_PERMISSION = exports.COUNTRY_PERMISSION = exports.PERMISSION_PERMISSION = exports.ROLE_PERMISSION = exports.USER_PERMISSION = exports.DEVELOPER_PERMISSION = exports.DEFAULT_ROLE = void 0;
 exports.REPORT_PERMISSION = exports.EXCHANGE_RATE_PERMISSION = exports.RATE_CARD_PERMISSION = exports.TIMESHEET_ENTRY_PERMISSION = exports.TIMESHEET_PERIOD_PERMISSION = exports.CURRENCY_PERMISSION = exports.RESOURCE_ROLE_TYPE_PERMISSION = exports.PROJECT_PERMISSION = exports.COUNTRY_PERMISSION = exports.PERMISSION_PERMISSION = exports.ROLE_PERMISSION = exports.USER_PERMISSION = exports.DEVELOPER_PERMISSION = exports.DEFAULT_ROLE = void 0;
 exports.DEFAULT_ROLE = Object.freeze({
     DEVELOPER: 'Developer',
@@ -113,6 +114,23 @@ exports.EXCHANGE_RATE_PERMISSION = Object.freeze({
     DELETE: 'ExchangeRate_Delete',
 });
 /**
+ * One permission per action (rather than a single shared `MANAGE`), matching
+ * the API spec's RBAC matrix distinguishing "Invoice GenerateInvoice + Manage"
+ * (ProjectAdmin + SystemAdmin) from `DeleteInvoice`/`VoidInvoice` (the spec's
+ * per-endpoint `Auth` column restricts those two to `SystemAdmin` only). Which
+ * role(s) get which permission is a data/seeding decision — see the note on
+ * `TIMESHEET_ENTRY_PERMISSION` above.
+ */
+exports.INVOICE_PERMISSION = Object.freeze({
+    LIST: 'Invoice_List',
+    GENERATE: 'Invoice_Generate',
+    UPDATE: 'Invoice_Update',
+    DELETE: 'Invoice_Delete',
+    SEND: 'Invoice_Send',
+    MARK_PAID: 'Invoice_MarkPaid',
+    VOID: 'Invoice_Void',
+    CANCEL: 'Invoice_Cancel',
+    DOWNLOAD_PDF: 'Invoice_DownloadPdf',
  * Per the API spec's RBAC matrix, all of Module 5 (`GenerateTimesheetReport`,
  * `GenerateUserRolesSummary`, `GenerateMonthlyCostRevenue` and their `Export*`
  * counterparts) is `ProjectAdmin`/`SystemAdmin`-only with no partial/"own

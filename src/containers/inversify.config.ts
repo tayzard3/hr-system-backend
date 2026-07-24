@@ -69,6 +69,11 @@ import { ExchangeRateRepository } from '../repositories/ExchangeRateRepository'
 import { IExchangeRateService } from '../interfaces/service/IExchangeRateService'
 import { ExchangeRateService } from '../services/ExchangeRateService'
 import { ExchangeRateController } from '../controllers/ExchangeRateController'
+import { IReportRepository } from '../interfaces/repository/IReportRepository'
+import { ReportRepository } from '../repositories/ReportRepository'
+import { IReportService } from '../interfaces/service/IReportService'
+import { ReportService } from '../services/ReportService'
+import { ReportController } from '../controllers/ReportController'
 
 const container = new Container()
 
@@ -112,6 +117,7 @@ container
 container
 	.bind<IExchangeRateRepository>(TYPES.IExchangeRateRepository)
 	.to(ExchangeRateRepository)
+container.bind<IReportRepository>(TYPES.IReportRepository).to(ReportRepository)
 
 /** Service */
 container.bind<IUserService>(TYPES.IUserService).to(UserService)
@@ -141,6 +147,7 @@ container.bind<IRateCardService>(TYPES.IRateCardService).to(RateCardService)
 container
 	.bind<IExchangeRateService>(TYPES.IExchangeRateService)
 	.to(ExchangeRateService)
+container.bind<IReportService>(TYPES.IReportService).to(ReportService)
 
 // Bind SendGridEmailService or SMTPEmailService to email service
 container.bind<IEmailService>(TYPES.IEmailService).to(SendGridEmailService)
@@ -173,6 +180,7 @@ container
 container
 	.bind<ExchangeRateController>(TYPES.ExchangeRateController)
 	.to(ExchangeRateController)
+container.bind<ReportController>(TYPES.ReportController).to(ReportController)
 
 // container.bind<boolean>('DEBUG').toConstantValue(true)
 

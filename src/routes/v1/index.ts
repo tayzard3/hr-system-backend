@@ -12,6 +12,7 @@ import timesheetEntryRoutes from './timesheetEntryRoutes'
 import rateCardRoutes from './rateCardRoutes'
 import exchangeRateRoutes from './exchangeRateRoutes'
 import invoiceRoutes from './invoiceRoutes'
+import reportRoutes from './reportRoutes'
 import { protect } from '../../middlewares/authMiddleware'
 
 const router = Router()
@@ -29,5 +30,6 @@ router.use('/timesheet-entries', protect, timesheetEntryRoutes)
 router.use('/rate-cards', protect, rateCardRoutes)
 router.use('/exchange-rates', protect, exchangeRateRoutes)
 router.use('/invoices', protect, invoiceRoutes)
+router.use('/reports', protect, reportRoutes)
 
 export default router

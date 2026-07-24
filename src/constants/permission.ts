@@ -140,4 +140,19 @@ export const INVOICE_PERMISSION = Object.freeze({
 	VOID: 'Invoice_Void',
 	CANCEL: 'Invoice_Cancel',
 	DOWNLOAD_PDF: 'Invoice_DownloadPdf',
+ * Per the API spec's RBAC matrix, all of Module 5 (`GenerateTimesheetReport`,
+ * `GenerateUserRolesSummary`, `GenerateMonthlyCostRevenue` and their `Export*`
+ * counterparts) is `ProjectAdmin`/`SystemAdmin`-only with no partial/"own
+ * data" access for `User` (unlike `TIMESHEET_ENTRY_PERMISSION`, which splits
+ * "own" vs "all"). `VIEW` backs the three `Generate*` (on-screen) endpoints;
+ * `EXPORT` backs the three `Export*` (file-download) endpoints — split into
+ * two permissions rather than one shared `LIST` since exporting is a
+ * meaningfully different (and potentially more sensitive, data-exfiltration-
+ * adjacent) action than viewing on-screen. Which role(s) get which permission
+ * is a data/seeding decision — see the note on `TIMESHEET_ENTRY_PERMISSION`
+ * above.
+ */
+export const REPORT_PERMISSION = Object.freeze({
+	VIEW: 'Report_View',
+	EXPORT: 'Report_Export',
 })

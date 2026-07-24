@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.INVOICE_PERMISSION = exports.EXCHANGE_RATE_PERMISSION = exports.RATE_CARD_PERMISSION = exports.TIMESHEET_ENTRY_PERMISSION = exports.TIMESHEET_PERIOD_PERMISSION = exports.CURRENCY_PERMISSION = exports.RESOURCE_ROLE_TYPE_PERMISSION = exports.PROJECT_PERMISSION = exports.COUNTRY_PERMISSION = exports.PERMISSION_PERMISSION = exports.ROLE_PERMISSION = exports.USER_PERMISSION = exports.DEVELOPER_PERMISSION = exports.DEFAULT_ROLE = void 0;
+exports.REPORT_PERMISSION = exports.EXCHANGE_RATE_PERMISSION = exports.RATE_CARD_PERMISSION = exports.TIMESHEET_ENTRY_PERMISSION = exports.TIMESHEET_PERIOD_PERMISSION = exports.CURRENCY_PERMISSION = exports.RESOURCE_ROLE_TYPE_PERMISSION = exports.PROJECT_PERMISSION = exports.COUNTRY_PERMISSION = exports.PERMISSION_PERMISSION = exports.ROLE_PERMISSION = exports.USER_PERMISSION = exports.DEVELOPER_PERMISSION = exports.DEFAULT_ROLE = void 0;
 exports.DEFAULT_ROLE = Object.freeze({
     DEVELOPER: 'Developer',
 });
@@ -130,5 +131,20 @@ exports.INVOICE_PERMISSION = Object.freeze({
     VOID: 'Invoice_Void',
     CANCEL: 'Invoice_Cancel',
     DOWNLOAD_PDF: 'Invoice_DownloadPdf',
+ * Per the API spec's RBAC matrix, all of Module 5 (`GenerateTimesheetReport`,
+ * `GenerateUserRolesSummary`, `GenerateMonthlyCostRevenue` and their `Export*`
+ * counterparts) is `ProjectAdmin`/`SystemAdmin`-only with no partial/"own
+ * data" access for `User` (unlike `TIMESHEET_ENTRY_PERMISSION`, which splits
+ * "own" vs "all"). `VIEW` backs the three `Generate*` (on-screen) endpoints;
+ * `EXPORT` backs the three `Export*` (file-download) endpoints — split into
+ * two permissions rather than one shared `LIST` since exporting is a
+ * meaningfully different (and potentially more sensitive, data-exfiltration-
+ * adjacent) action than viewing on-screen. Which role(s) get which permission
+ * is a data/seeding decision — see the note on `TIMESHEET_ENTRY_PERMISSION`
+ * above.
+ */
+exports.REPORT_PERMISSION = Object.freeze({
+    VIEW: 'Report_View',
+    EXPORT: 'Report_Export',
 });
 //# sourceMappingURL=permission.js.map
